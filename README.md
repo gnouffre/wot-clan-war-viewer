@@ -12,6 +12,7 @@ To be functional, a CRON must be scheduled hourly : use the script is "Tools/ext
 ![alt tag](http://tof.canardpc.com/preview2/97f1cc8a-cea1-47ae-a21c-8b7007c69af1.jpg)
 
 To follow or participate to the developpement look Word of tank Forum
+
 English : [ link ](http://forum.worldoftanks.eu/index.php?/topic/565385-cw20-viewer-website/)
 
 Francais : [ link ](http://forum.worldoftanks.eu/index.php?/topic/510466-cw-20-interface/)
