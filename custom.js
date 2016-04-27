@@ -284,8 +284,9 @@ datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);
                             dataType: 'text',
                             async:false
                     });
+					 $('#preloadersync').hide();
                     return resultatajax;
-	      $('#preloadersync').hide();					
+	     					
       }, 100);
 	  };
 });		
