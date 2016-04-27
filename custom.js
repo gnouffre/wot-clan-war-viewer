@@ -372,7 +372,7 @@ function chargerlalistesave()   {
    map.addLayer(cartecomplete);
    layers = map.getLayers().getArray() ;
    vector = getLayerwarg(layers, "wargaming"); 
-
+	varlayersource = vector.getSource().getSource();
    	 
 var listenerchangelayer = varlayersource.once('change',function(e){
     if (varlayersource.getState() === 'ready') {
