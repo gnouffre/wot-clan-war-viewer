@@ -372,8 +372,8 @@ function chargerlalistesave()   {
    map.addLayer(cartecomplete);
    layers = map.getLayers().getArray() ;
    vector = getLayerwarg(layers, "wargaming"); 
-   };
-   	 varlayersource = vector.getSource().getSource();
+
+   	 
 var listenerchangelayer = varlayersource.once('change',function(e){
     if (varlayersource.getState() === 'ready') {
 	// carte chargée
@@ -391,14 +391,20 @@ var listenerchangelayer = varlayersource.once('change',function(e){
 } catch (e) {
     alert(e.message);
 }
-
 		map.getView().setCenter(center2Layers);	
         preloader.hide(); 	
-	
     };
 });   
-
+   }else
+  {
+  varlayersource = vector.getSource().getSource();
+   chargerlalog();
+   Filterprovinceonmap();
+	var modAff =  $('#ModeAffichage').val();
+	ModeAffichage(modAff);
+    preloader.hide(); 
   };
+  } 
       }, 100);
 };
  
