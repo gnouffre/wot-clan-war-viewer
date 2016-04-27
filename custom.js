@@ -347,7 +347,7 @@ function chargerlalistesave()   {
    // optimization : reload geojson map only if change 
    if (chargedgeojson !=  listeinfos['season_id'])
    {
-   
+   chargedgeojson = listeinfos['season_id'];
    map.removeLayer(vector);
    cartecomplete = new ol.layer.Image({
 	        idbase : "wargaming",
