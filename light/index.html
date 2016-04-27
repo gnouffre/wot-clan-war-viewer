@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <title>WOT Clan War Viewer</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+
+    
+    <link rel="stylesheet" href="../tools/ol.css" type="text/css">
+    <link rel="stylesheet" href="../tools/jquery-ui.css">
+	<link rel="stylesheet" href="../tools/jquery-ui.structure.min.css">
+	<link rel="stylesheet" href="../tools/jquery-ui.theme.min.css">
+	<script src="../tools/ol.js"></script>
+    <script type="text/javascript" src="../tools/datatables.min.js"></script>
+	
+</head>
+
+<body>
+  
+
+
+
+            
+			<div class="row wow fadeInUp" data-wow-delay=".3s">
+
+			<h2 style="text-align:center;">WOT CLAN WAR VIEWER -Light version</h2>
+			<div style="clear:both;"></div>
+				<div >
+				<a id="inputFullscreen" href="http://wotclanwar2.16mb.com/" >Goto Full CW Viewer</a>
+						<select id= "choixSave" name="choixSave" class="form-control"></select>			
+						<div style="clear:both;"></div>
+				<div id="map" class="map"></div>		
+				</div>
+			</div>			
+	
+</body>
+
+</html>
+
+<script>
+var annuaireclan = JSON.parse(affichageclanproperty("CLANLIST", " ", false));	
+	var listesaveresult = JSON.parse(affichageclanproperty("SAVE", " ", false));
+	var dernieresave = affichageclanproperty("LASTSAVE", " ", false);
+	  
+      var map = new ol.Map({
+	  RendererType: 'canvas',
+	     controls: ol.control.defaults().extend([
+		  varFullscreen = new ol.control.FullScreen()
+        ]),		
+        layers: [
+ 		 new ol.layer.Tile({
+		 idbase : "TileWMS",
+      title: 'Global Imagery',
+      source: new ol.source.TileWMS({
+        url: 'http://demo.opengeo.org/geoserver/wms',
+        params: {LAYERS: 'ne:NE1_HR_LC_SR_W_DR', VERSION: '1.1.1'}
+      })
+    })
+        ],
+		target: 'map',
+        view: 
+		new ol.View({
+          center: [0, 0],
+          zoom: 3,
+		  minZoom: 3,
+          maxZoom: 8
+        }) 
+      });
+
+
+
+  		
+var layers ;
+var vector ;  
+var varlayersource ;
+
+chargerlasave(dernieresave);
+
+
+
+
+$(document).ready(function(){ 
+chargerlalistesave();
+    $( "#choixSave" ).change (function() {
+	
+	   chargerlasave($( this ).val());
+       })
+});	
+	
+		function chargerlalistesave()
+  {
+  
+  
+  $.each(listesaveresult, function(save) {   
+     $('#choixSave')
+         .append($("<option></option>")
+         .attr("value",listesaveresult[save].fichier)
+         .text(listesaveresult[save].date)); 	 
+});
+
+  };
+
+    function chargerlasave(save) {
+
+   layers = map.getLayers().getArray() ;
+   vector = getLayerwarg(layers, "wargaming"); 
+   map.removeLayer(vector);
+   
+
+  if (save) {
+  listeclan = affichageclanproperty("LOADSAVE", save, false);
+   listeinfos = JSON.parse(listeclan);
+   
+   if (listeinfos['season_id']) {
+   var lamapsave = '../tools/map/' +listeinfos['season_id'] + '.geojson';
+   } else {
+   var lamapsave = '../tools/map/europemap.geojson';
+   };
+   cartecomplete = new ol.layer.Image({
+	        idbase : "wargaming",
+            source: new ol.source.ImageVector({
+              source: new ol.source.Vector({
+			  opacity : 0.2,
+                url: lamapsave,
+                format: new ol.format.GeoJSON()
+              }),
+              style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                  color: [255, 255, 255, 0.5],
+                }),
+                stroke: new ol.style.Stroke({
+                  color: '#319FD3',
+                  width: 1
+                })
+              })
+            })
+          });
+   map.addLayer(cartecomplete);
+   layers = map.getLayers().getArray() ;
+   vector = getLayerwarg(layers, "wargaming"); 
+   	varlayersource = vector.getSource().getSource();
+	
+var listenerKey = varlayersource.once('change', function(e) {
+  if (varlayersource.getState() == 'ready' ) {
+	console.log('ready...'); 
+	map.unByKey(listenerKey);
+	ModeAffichage();
+	map.render();
+	    };
+		});
+    };
+
+};
+
+function ModeAffichage() {
+
+
+effacericone();
+affichageclancolor();
+afficherlesicones();
+  
+};
+
+
+function affichageclancolor() {	
+var vector = getLayerwarg(layers, "wargaming");  	  
+var varlayersource = vector.getSource().getSource();
+var layerfeatures = new 	ol.source.Vector();		  
+layerfeatures.addFeatures (varlayersource.getFeatures());
+map.removeLayer(vector);
+var features = layerfeatures.getFeatures()
+
+var layer = new ol.layer.Image({
+            idbase : "wargaming",
+            source: new ol.source.ImageVector({
+              source: layerfeatures,
+              style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                  color: [255, 255, 255, 1],
+                }),
+                stroke: new ol.style.Stroke({
+                  color: '#319FD3',
+                  width: 1
+                })
+              })
+            })
+          });
+map.addLayer(layer);
+
+
+// recherche des infos			  
+
+var stylecache = new Array;
+// boucle sur les fronts //	
+var clancolor;
+var color;
+$.each(listeinfos['provinces'], function(index, province) {
+
+var provinceatraiter = listeinfos['provinces'][index];
+var couleurhexa = '#000000';
+if (provinceatraiter['owner_clan_id'] !== null) {
+var leclantrouve = provinceatraiter['owner_clan_id'];
+if (annuaireclan[leclantrouve]) {
+couleurhexa = annuaireclan[leclantrouve].color;
+clancolor = hexToRgb1(couleurhexa) ;
+color = [clancolor[0], clancolor[1],clancolor[2], 0.8];
+} else {
+couleurhexa = '#000000';
+clancolor = hexToRgb1(couleurhexa) ;
+color = [clancolor[0], clancolor[1],clancolor[2], 1];
+}
+} else {
+couleurhexa = '#F8F8FF';
+clancolor = hexToRgb1(couleurhexa) ;
+color = [clancolor[0], clancolor[1],clancolor[2], 0.1];
+}
+if (!stylecache[couleurhexa]) {
+stylecache[couleurhexa]  = new ol.style.Style({
+                 fill: new ol.style.Fill({
+                   color: color
+                 }),
+                 stroke: new ol.style.Stroke({
+                   color: '#FFFFFF',
+                   width: 1
+                 })
+               });
+			   
+			   };
+			   
+
+ var result3 = $.grep(features, function(e){ return e.getProperties().province_id == provinceatraiter['province_id']});
+
+if ( result3[0] ) {
+ result3[0].setStyle(stylecache[couleurhexa]);
+ };
+ }); 
+
+};		
+
+
+
+function afficherlesicones() {	
+
+
+var vector = getLayerwarg(layers, "wargaming");
+var varlayersource = vector.getSource().getSource();
+var layerfeatures = new 	ol.source.Vector();		  
+layerfeatures.addFeatures (varlayersource.getFeatures());
+var featuresas = layerfeatures.getFeatures()
+
+
+			
+			
+var layer = new ol.layer.Vector({
+            idbase : "icone",
+            source: new ol.source.Vector({
+            })
+          });
+map.addLayer(layer);
+var nouvellesource = layer.getSource();
+
+
+// recherche des infos			  
+
+var stylecache = new Array;
+// boucle sur les fronts //	
+
+$.each(listeinfos['provinces'], function(index, province) {
+
+var provinceatraiter = listeinfos['provinces'][index];
+var couleurhexa = '#000000';
+if (provinceatraiter['owner_clan_id']) {
+var leclantrouve = provinceatraiter['owner_clan_id'];
+if (annuaireclan[leclantrouve] && leclantrouve !== null ) {
+emblem = annuaireclan[leclantrouve].emblem_url;}
+else {
+emblem = 'vide';
+}
+} else {
+emblem = 'vide';
+}
+if (!stylecache[emblem]) {
+stylecache[emblem]  = new ol.style.Style({
+                 image: new ol.style.Icon (({
+                            scale: getScaleZoom(),                            
+                            src: emblem,
+							opacity: 0.8
+                        }))
+               });
+			   
+			   };
+	   
+
+ var result3 = $.grep(featuresas, function(e){ return e.getProperties().province_id == provinceatraiter['province_id']});
+
+if ( result3[0] &&  emblem != 'vide') {
+
+var geometry = result3[0].getGeometry();
+
+
+          var point = getCenterOf(geometry);       
+		   newFeature = new ol.Feature({
+		    ceciestunicone:true,
+            geometry: new ol.geom.Point(point)
+          });
+ newFeature.setStyle(stylecache[emblem] );
+ nouvellesource.addFeature(newFeature);
+ 
+
+ 
+ };
+ }); 
+ 
+
+};
+ 
+
+function getCenterOf(geometry) {	
+
+switch (geometry.getType()) {
+          case 'MultiPolygon':
+            var poly = geometry.getPolygons().reduce(function(left, right) {
+              return left.getArea() > right.getArea() ? left : right;
+            });
+            point = poly.getInteriorPoint().getCoordinates();
+            break;
+          case 'Polygon':
+            point = geometry.getInteriorPoint().getCoordinates();
+            break;
+          default:
+            point = geometry.getClosestPoint(coordinate);
+          }
+		  return point;
+
+};
+ 
+ 
+function effacericone() {	
+
+
+var vector = getLayerwarg(layers, "icone");   
+
+map.removeLayer(vector);
+var vector = getLayerwarg(layers, "texte2");   
+
+map.removeLayer(vector);
+var vector = getLayerwarg(layers, "texte");   
+
+map.removeLayer(vector);
+
+}; 
+ 
+   function getLayerwarg  (vector, id) {
+        var layer;
+        vector.forEach(function (lyr) {
+            if (id == lyr.get('idbase')) {
+                layer = lyr;
+            }            
+        });
+        return layer;
+    }
+
+function getScaleZoom() {
+
+	// taille icone en fonction zoom
+	var scalezoom = new Array();
+	scalezoom[3] = 0.2;
+	scalezoom[4] = 0.4;
+	scalezoom[5] = 0.8;
+	scalezoom[6] = 1;
+	scalezoom[7] = 2;
+	scalezoom[8] = 3;
+	
+	
+var monzoom = map.getView().getZoom();
+var zoomopt = Math.round(monzoom);
+var scale  = scalezoom[zoomopt];
+
+return scale
+};
+
+	   
+function affichageclanproperty(entree, clanid, async)  {
+            var resultatajax = "";
+
+                    $.ajax({
+                    type: 'POST',
+                            url: 'cw2function.php',
+                            data: {typeselection: entree,
+							clanid : clanid
+							},
+                            success: function(result) {
+                            resultatajax = result;
+                            },
+                            dataType: 'text',
+                            async:async
+                    });
+                    return resultatajax;
+            };
+
+
+	  
+function hexToRgb1 (hex) {
+        hex = hex.replace(/[^0-9A-F]/gi, '');
+        var bigint = parseInt(hex, 16);
+        var r = (bigint >> 16) & 255;
+        var g = (bigint >> 8) & 255;
+        var b = bigint & 255;
+        var result = [r,g,b]
+        return result;
+    };
+
+
+	
+
+	  
+	
+	
+	</script>

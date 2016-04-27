@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <title>WOT Clan War Viewer</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+
+    <!-- Bootstrap Css -->
+    <link href="bootstrap-assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Style -->
+    <link href="plugins/owl-carousel/owl.carousel.css" rel="stylesheet">
+    <link href="plugins/owl-carousel/owl.theme.css" rel="stylesheet">
+    <link href="plugins/owl-carousel/owl.transitions.css" rel="stylesheet">
+    <link href="plugins/Lightbox/dist/css/lightbox.css" rel="stylesheet">
+    <link href="plugins/Icons/et-line-font/style.css" rel="stylesheet">
+    <link href="plugins/animate.css/animate.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <!-- Icons Font -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="tools/ol.css" type="text/css">
+    <link rel="stylesheet" href="tools/jquery-ui.css">
+	<link rel="stylesheet" href="tools/jquery-ui.structure.min.css">
+	<link rel="stylesheet" href="tools/jquery-ui.theme.min.css">
+	<link rel="stylesheet" href="tools/datatables.min.css">
+	<link rel="stylesheet" href="tools/jquery.dataTables.yadcf.css">
+	<link rel="stylesheet" href="tools/select2.min.css">
+	<link rel="stylesheet" href="tools/select2-bootstrap.min.css">
+	
+	<style>
+
+		table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:rgba(255,255,255,0.7);z-index:202}div.DTCR_pointer{width:1px;background-color:#0259C4;z-index:201}
+html, body {
+ margin:0;
+ padding:0;
+ }
+	  .screen {
+        margin-bottom: 10px;
+        width: 100%;
+        height: 100vh;
+		background-color : aliceblue;
+      }
+	  :-moz-full-screen .screen {
+        height: 100vh;
+      }
+      :-webkit-full-screen .screen {
+        height: 100vh;
+      }
+      :-ms-fullscreen .screen{
+        height: 100vh;
+      }
+
+      :fullscreen .screen{
+        height: 100vh;
+      }
+      	  
+	   .Fbottomscreen {
+         margin-bottom: 10px;
+        width: 100%;
+        height: 0vh;
+		display:none;
+      }
+	  
+	  .bottomscreen {
+        margin-bottom: 10px;
+        width: 100%;
+        height:  calc(100% - 400px);
+      }
+	  	  
+	   .Ftopscreen {
+        margin-bottom: 10px;
+        width: 100%;
+        height: 100vh;
+      }
+	  .topscreen {
+        margin-bottom: 10px;
+        width: 100%;
+        height:  400px;
+      }
+      	  
+      .ol-rotate {
+        top: 3em;
+      }
+      .map {
+        width: 80%;
+        height: 80%;
+      }
+	  
+	  .map:-moz-full-screen {
+  height: 100%;
+}
+.map:-webkit-full-screen {
+  height: 100%;
+}
+.map:-ms-fullscreen {
+  height: 100%;
+}
+.map:fullscreen {
+  height: 100%;
+}
+	  
+	  
+      .sidepanel {
+        width: 20%;
+        height: 100%;
+        float: left;
+      }
+	  .sidepanelright {
+        width: 80%;
+        height: 100%;
+        float: right;
+      }
+
+      .sidepanel-title {
+        width: 100%;
+        font-size: 2em;
+        display: block;
+        text-align: center;
+      }
+	  
+	  
+	  
+	   .ol-popup {
+        position: absolute;
+        background-color: white;
+        -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+        filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #cccccc;
+        bottom: 12px;
+        left: -50px;
+        min-width: 280px;
+      }
+      .ol-popup:after, .ol-popup:before {
+        top: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+      .ol-popup:after {
+        border-top-color: white;
+        border-width: 10px;
+        left: 48px;
+        margin-left: -10px;
+      }
+      .ol-popup:before {
+        border-top-color: #cccccc;
+        border-width: 11px;
+        left: 48px;
+        margin-left: -11px;
+      }
+      .ol-popup-closer {
+        text-decoration: none;
+        position: absolute;
+        top: 2px;
+        right: 8px;
+      }
+      .ol-popup-closer:after {
+        content: "X";
+      }
+	  .ui-widget {
+       font-family: Verdana,Arial,sans-serif;
+       font-size: 8pt;
+       }
+    .titreentoure {
+    padding: 4px;
+    margin: 5px;
+    border: 1px solid grey;
+    border-radius: 10px;
+	display:inline;
+	
+}
+  .custom-combobox {
+    position: relative;
+    display: inline-block;
+  }
+  .custom-combobox-toggle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin-left: -1px;
+    padding: 0;
+  }
+  .custom-combobox-input {
+    margin: 0;
+    padding: 5px 10px;
+  }
+/*
+* Sort arrow icon positioning
+*/
+table.display thead th div.DataTables_sort_wrapper {
+position: relative;
+padding-right: 20px;
+padding-right: 20px;
+}
+
+table.display thead th div.DataTables_sort_wrapper span {
+position: absolute;
+top: 50%;
+margin-top: -8px;
+right: 0;
+}
+.pdfbutton {
+        top: 5em;
+		left: .5em;
+      }
+.googlebutton {
+        top: 7em;
+		left: .5em;
+      }
+	  
+.selectlist {
+        top: .5em;
+		left: 6em;
+      }	 
+.ol-full-screen {
+        top: .5em;
+		right: .5em;
+      }	
+html.cursorwait, html.cursorwait * { cursor: progress !important; }
+
+.select2-container--default .select2-selection--single{
+    padding:6px;
+    height: 37px;
+    width: 148px; 
+    font-size: 1.2em;  
+    position: relative;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    background-image: -khtml-gradient(linear, left top, left bottom, from(#424242), to(#030303));
+    background-image: -moz-linear-gradient(top, #424242, #030303);
+    background-image: -ms-linear-gradient(top, #424242, #030303);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #424242), color-stop(100%, #030303));
+    background-image: -webkit-linear-gradient(top, #424242, #030303);
+    background-image: -o-linear-gradient(top, #424242, #030303);
+    background-image: linear-gradient(#424242, #030303);
+    width: 40px;
+    color: #fff;
+    font-size: 1.3em;
+    padding: 4px 12px;
+    height: 27px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 20px;
+}	
+.yadcf-number-slider-filter-wrapper-inner {
+width: 100px;
+}  
+
+.col-lg-2 {
+  height: 80vh;
+}
+.divcol-lg-2 {
+  margin : 8px;
+  height: 60vh;
+  overflow-y: scroll; 
+  
+}
+.navbar-default .nav-wrap {
+  width: 90%;
+}
+
+
+.preloader-container {
+	width: 80vh;
+	height: 80vh;
+	position: absolute;
+	top:0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	
+	margin: auto;
+	text-align: center;
+}
+.preloader-container i {
+  color: #fff;
+  position: absolute;
+  font-size: 36px;
+  line-height: 36px;
+  top: 50%;
+  left: 50%;
+  height: 36px;
+  width: 36px;
+  margin-top: -15px;
+  margin-left: -15px;
+  display: inline-block;
+}
+.nonentouree {
+    padding: 4px;
+    margin: 5px;
+    display: inline-block;
+	float : left; 
+	 height: 80%;
+}
+.entouree2 {
+    padding: 4px;
+    margin: 5px;
+    border: 1px solid grey;
+    border-radius: 10px;
+	display: inline-block;
+	float : left;
+	height: 70vh;
+    overflow-y: auto; 
+	width : 25%;
+}
+.entouree3 {
+    padding: 4px;
+    margin: 5px;
+    border: 1px solid grey;
+    border-radius: 10px;
+	display: inline-block;
+	float : left;
+	height: 70vh;
+    overflow-y: auto; 
+	width : 35%;
+}
+
+.modal-body {
+    position: relative;
+    padding: 1px;
+}
+
+/* Style no input-group
+ * ------------------------------ */
+.yadcf-filter-wrapper {
+    display: block;
+
+    padding-right: 36px;
+
+    white-space: nowrap;
+}
+.yadcf-filter-wrapper .form-control,
+.yadcf-filter-wrapper .select2-container,
+.yadcf-filter-wrapper .select2-container.form-control,
+.yadcf-filter-wrapper .yadcf-number-slider-filter-wrapper-inner {
+    display: inline-block;
+
+    width: 100%;
+}
+.yadcf-filter-wrapper .yadcf-filter-range-date {
+    width: 100px;
+}
+.yadcf-filter-wrapper .yadcf-filter-range-number {
+    width: 60px;
+}
+
+/* Range wrapper */
+.yadcf-filter-wrapper-inner {
+    display: inline-block;
+
+    vertical-align: middle;
+}
+
+/* Range input */
+.yadcf-filter-range {
+    display: inline-block;
+
+    vertical-align: middle;
+}
+
+/* Range separator */
+.yadcf-filter-range-date-seperator,
+.yadcf-filter-range-number-seperator {
+    display: inline-block;
+
+    margin-left: 1px;
+
+    vertical-align: middle;
+}
+
+/* Reset button */
+.yadcf-filter-reset-button {
+    display: inline-block;
+
+    margin-right: -36px;
+    margin-left: 1px;
+
+    vertical-align: top;
+}
+.yadcf-filter-reset-button.btn {
+    font-size: 11px;
+    line-height: 20px;
+
+    color: #d9d9d9;
+}
+.yadcf-filter-reset-button.btn:hover {
+    color: #333;
+}
+
+
+/* If set stack range 
+ * ------------------------------ */
+/* Range wrapper */
+.yadcf-range-stack .yadcf-filter-wrapper-inner {
+    display: inline-block;
+
+    vertical-align: top;
+}
+
+/* Range input */
+.yadcf-range-stack .yadcf-filter-range {
+    display: block;
+}
+
+/* Range separator */
+.yadcf-range-stack .yadcf-filter-range-date-seperator,
+.yadcf-range-stack .yadcf-filter-range-number-seperator {
+    display: none;
+}
+    </style>
+	
+</head>
+
+<body>
+    <!-- Preloader
+	============================================= -->
+     <div class="preloader" id="preloader" hidden>
+	<div class='preloader-container'>
+	<i class="fa fa-circle-o-notch fa-spin fa-2x"></i><span> <font color="white">Loading Data...</font></span>
+
+</div>
+	</div>
+	     <div class="preloader" id="preloadersync" hidden>
+	<div class='preloader-container'>
+	<i class="fa fa-refresh fa-spin fa-2x"></i><span> <font color="white">Synchronization with Wargaming...</font></span>
+
+</div>
+	</div>
+	<div class="preloader" id="building" hidden>
+	<div class='preloader-container'>
+	<i class="fa fa-cog fa-spin fa-3x fa-fw margin-bottom"></i><span> <font color="white">New map detected, Building Map plz dont interrupt...</font></span>
+	<div class="progress">
+    <div id="loading-progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0%" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+    </div>
+	</div>
+</div>
+	</div>
+    <!-- Header
+	============================================= -->
+    <section class="main-header">
+	
+	
+	
+		<nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+			    <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse text-center" id="bs-example-navbar-collapse-1">
+                    <div class="col-md-8 col-xs-12 nav-wrap">
+                        <ul class="nav navbar-nav">
+                            <li><a href="#welcome" class="page-scroll">News</a></li>
+                            <li><a href="#Season" class="page-scroll">Season/Event</a></li>
+                            <li><a href="#Mapp" class="page-scroll">Map</a></li>
+                            <li><a href="#Data" class="page-scroll">Provinces Data</a></li>
+                            <li><a href="#Clan" class="page-scroll">Clan Data</a></li>
+                            <li><a href="#Tutorial" class="page-scroll">Tutorial</a></li>
+                            <li><a href="#contact" class="page-scroll">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+
+	    <div id="welcome" class=" owl-theme"class="container">
+					<footer>
+				<div class="container">
+					<h1>WOT Clan War Viewer</h1>
+				</div>
+			</footer>
+            <div class="row wow fadeInUp" data-wow-delay=".3s">
+                <div class="col-lg-12">
+                    <span class="cogs"></span>
+                    <h2>What new in WOT Clan Viewer</h2>
+					<p>Still Beta Mod...</p> 
+					<p>Building map, Zoom province, Clan information to finish</p> 
+					<p>Added List of season/event, RSS news about CW from Wargaming</p><p>.</p> 
+                </div>
+			<div class="container">
+            <hr class="sep">
+			<h2 style="text-align:center;"> Latest News from Wargaming</h2>
+            <div id="Newscarousel"class="owl-carousel owl-theme ">
+			
+			</div>
+        </div>
+			</div>	
+<!--             <div class="row wow fadeInUp" data-wow-delay=".3s">
+                <div class="col-lg-3">
+                    <span class="icon-globe"></span>
+                    <h4>1.Show live map</h4>
+					<p>View Clan mode</p> 
+					<p>View Battles mode</p> 
+					<p>View ELO mode</p> 
+					<p>View Language mode</p>
+					<p>and more...</p>
+					
+                </div>
+                <div class="col-lg-3">
+                    <span class="icon-gears"></span>
+                    <h4>2.Powerfull Filter</h4>
+					<p>Clan, ELO, Language, </p> 
+					<p>Front, Prime Time, Revenue</p> 
+					<p>and more...</p> 
+                </div>
+                <div class="col-lg-3">
+                    <span class="icon-clock"></span>
+                    <h4>3.Show Historic map</h4>
+					<p>Map refresh every Hour </p> 
+					<p>User can refresh it once per 5 minutes</p> 
+					<p>One Save every night</p> 
+                </div> 
+				<div class="col-lg-3">
+                    <span class="icon-beaker"></span>
+                    <h4>4.Still in developpement</h4>
+					<p>Add battle detail viewer </p> 
+					<p>Add province detail viewer</p> 
+					<p>Add Officials Links to wargaming</p> 
+                </div> 				
+            </div> -->
+        </div>	
+    </section>
+
+	
+		    <!-- Season / Event
+	============================================= -->
+    <section id="Season">
+        <div class="container">
+            <hr class="sep">
+			<h2 style="text-align:center;"> Season / Event </h2>
+            <div class="row wow fadeInUp" data-wow-delay=".3s">
+				<table id="tabs-season" class="table table-striped table-bordered" width="100%"></table>
+			</div>
+        </div>
+    </section>
+	
+	
+	
+    <!-- Mapp
+	============================================= -->
+    <section id="Mapp">
+
+            
+			<div class="row wow fadeInUp" data-wow-delay=".3s">
+						<hr class="sep">
+			<h2 style="text-align:center;">Map</h2>
+
+				<div class="col-lg-2 container">
+				<div >
+					    <a id="inputFullscreen" class="btn btn-warning modal-title"><i class="fa fa-television "></i> Fullscreen Map</a>
+						<a id="reactualisation" class="btn btn-info modal-title" data-toggle="tooltip" title="To limit Abuse, One Server Resynchronisation authorized every 5 minutes unless reload most recent available"><i class="fa fa-refresh "></i> Resync/Reload</a>
+						<span id="dernierereact"><noscript></noscript></span>
+						<span id="compte_a_rebours"><noscript></noscript></span>
+						<select id= "choixSave" name="choixSave" class="form-control"></select>			
+						<div style="clear:both;"></div><span><select id= "ModeAffichage" name="ModeAffichage" onchange="ModeAffichage(this.value)" class="form-control">
+						<option value="Clan" selected>Clan Mode</option>
+								<option value="Front" >Front Mode</option>
+								<option value="Horaire" >Prime Time Mode</option>
+								<option value="Revenu" >Revenue Mode</option>
+								<option value="Infrastructure" >Province Level Mode</option>
+								<option value="Batailles" >Battles Mode</option>	
+								<option value="Batailles2" >Battles V2 Mode</option>
+								<option value="Langage" >Language Mode</option>	
+								<option value="ClanELO6" >ELO VI Mode</option>
+								<option value="ClanELO8" >ELO VIII Mode</option>
+								<option value="ClanELO10" >ELO X Mode</option>
+								<option value="Province" >Province Mode</option>
+								<option value="accepts_join_requests" >Accept join request Mode</option>
+								<option value="members_count" >Clan Members count Mode</option>
+								<option value="battles" >Clan Number battles Mode</option>	
+								<option value="battles_6_level" >Level 6 Clan Number battles Mode</option>
+								<option value="battles_8_level" >Level 8 Clan Number battles Mode</option>
+								<option value="battles_10_level" >Level 10 Clan Number battles Mode</option>
+								<option value="battles_6_percent" >percent 6 Clan Number battles Mode</option>
+								<option value="battles_8_percent" >percent 8 Clan Number battles Mode</option>
+								<option value="battles_10_percent" >percent 10 Clan Number battles Mode</option>
+								<option value="wins" >Clan Number battles wins Mode</option>
+								<option value="winspercent" >Clan Percent battles wins Mode</option>
+								<option value="wins_6_level" >Level 6 Win Clan Percent battles</option>
+								<option value="wins_8_level" >Level 8 Win Clan Percent battles</option>
+								<option value="wins_10_level" >Level 10 Win Clan Percent battles</option>		
+								<option value="losses" >Clan Number battles losses Mode</option>
+								<option value="lossespercent" >Clan Percent battles losses Mode</option>
+								<option value="provinces_count" >Number provinces Clan Mode</option>
+															
+								</select></span>
+						<div id="externaly_triggered_wrapper-controls">
+						<a id="result_filters" class="btn btn-default" data-toggle="tooltip" title="Click on button Manage Filter to change or Reset All Filter to have all map" >Filter Result</a>
+						<div class="form-inline">
+							<input id="Manage_filters" type="button" value="Manage filters"  class="btn btn-primary"  >
+							<input type="button" onclick="yadcf.exResetAllFilters(oTable);" value="Reset all Filters"  class="btn btn-primary"  >
+						</div>
+					</div>
+						</div>
+						
+						
+				</div>		
+				<div class="col-lg-10">
+				
+					<div id="map" class="map"></div>
+					<div id="loading-div" style="position: absolute" hidden><div>Chargement en cours</div><div style="margin : 0 auto;"><img style="display: block; margin-left: auto; margin-right: auto" src="img/ajax-loader.gif"></div></div>
+				</div>	
+			</div>	
+    </section>
+    
+
+	    <!-- Data
+	============================================= -->
+    <section id="Data">
+        <div class="container">
+            <hr class="sep">
+			<h2 style="text-align:center;"> Provinces Data </h2>
+            <div class="row wow fadeInUp" data-wow-delay=".3s">
+				<table id="tabs-9tab" class="table table-striped table-bordered" width="100%"></table>
+			</div>
+        </div>
+    </section>
+	
+	    <!-- Clan
+	============================================= -->
+    <section id="Clan">
+        <div class="container" data-wow-delay=".3s">
+            <hr class="sep">
+			<h2 style="text-align:center;"> Clan Data </h2>
+			
+				<div>
+					<span id="external_filter_container_100" hidden></span>
+				</div>
+
+            <div class="row wow fadeInUp " data-wow-delay=".3s">
+				<table id="tabs-clan" class="table table-striped table-bordered" width="100%"></table>
+			</div>
+        </div>
+    </section>
+
+	    <!-- Tutorial
+	============================================= -->
+    <section id="Tutorial">
+	 <div class="container">
+				<hr class="sep">
+			<h2 style="text-align:center;">Tutorial</h2>
+
+        <div id="Tutorialcarousel"class="owl-carousel owl-theme">
+		<div class="item">
+                <div class="container">
+				<div class="col-md-8">
+                    <div class="team">
+                         <h4>Interaction with Map</h4>
+						 <h6>Direct Controls</h6>
+							<p>Direct controls are available on map screen. They allow :</p>
+							<p>-Zoom with the control +/-</p>
+							<p>-Fullscreen with the control <--></p>
+							<p>-Image Save (right click on map)</p>
+							<p>-Click on province for detail on it</p>
+							<p>-DblClick on province for openning The Official Wargaming province</p>
+						<h6>InDirect Controls</h6>
+							<p>Indirect controls allow to modifiy the appearance of the map acting on :</p>
+							<p>-Display mode</p>
+							<p>-Filters province</p>	
+                    </div>
+                </div></div>
+        </div>
+		<div class="item">
+                <div class="container">
+				<div class="col-md-8">
+                    <div class="team">
+                        <img class="img-responsive center-block" src="img/tutorial/clan mod.png" alt="Clan Mode">
+                         <h4>Display mode : Clan</h4>
+							<p>Province are colored by the clan-color and the emblem is shown. If province have no Owner, no color and no emblem are show. Owner can be missing cause the province was abandonned and the owner are Civilians, or the Clan is not yet referenced as owner by wargaming, just wait next syncronization.</p>
+                        
+                    </div>
+                </div></div>
+        </div>
+				<div class="item">
+                <div class="container">
+				<div class="col-md-8">
+				<img class="img-responsive center-block" src="img/tutorial/frontmode.png" alt="Front Mode">
+                <div class="portfolio-box-caption-content">
+                    <h4>Display mode : Front</h4>
+					<p> With a Red and blue gradient, one color is affected to each distinct front. Then this color is affected to the province acording to the front property of this province.</p>
+                </div>
+                </div></div>
+        </div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/primetimemode.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Display mode : Prime Time</h4>
+							<p> Similar method than front, Red to Blue gradient is affected to each province acording to his prime time property.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/revenu mode.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Display mode : Revenue / Level</h4>
+							<p> The revenu is the base income of the province. The level represent the infrastructure of the province, exact income depend of those values. The map is displayed with green to white gradient, the green color is stronger if the revenu or level is important. The exact revenu or level is also written on the province.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/mode batailles new.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Display mode : Battles / Battles V2</h4>
+							<p> During the day clan can attack a neigbourg province, or make a debarquement on landing province. On the first case they are named Attackers, on the second Competitors. The first mod Battle allow to show color clan map, with indicator of Attackers + Competitors. The second mod Battles V2 is more elaborate, it show the same value but province are in red if battles are actives, and green if battles are finished or not beginned. There is also a gradient to indicate the intensity of battles.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/language mode.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Display mode : Language</h4>
+							<p> !!!This function is experimental and not 100% accurate !!!.</p>
+							<p> Each different language detected bring a random color on map. Each language is also represented with a flag</p>
+							<P>The first time clan succeded a debarquement, his language was analyzed. This was done with the "Clan Description". This text was submit to a language analyzer that give a estimated language.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/elo mode.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Display mode : ELO</h4>
+							<p> Similar to revenu, The map is displayed with green to white gradient, the green color is stronger if the ELO is important. The exact ELO is also written on the province.</p>
+							<p>3 elo mode are present for level VI, VIII, X.</p>
+							<p>Fine Level is also allowed, this value is given by wargaming to evaluate if a clan fight on the right front according to his ELO values.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/province mode.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Display mode : Province</h4>
+							<p>This mod show province on map labelled by their name.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/filter available.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Filter : using</h4>
+							<p>A large choice of filter are available on the left of the map. They are cumulative, we can use multiple selector on same time. When Filter are choosen, just click on "Filter" Button to applied the search. Majority of them are multiselect, we can choose one or more value, there is also range number value where min and max value can be positionned for the search.  If u want to remove all the filters, just click on "Reset" Button. </p>
+						</div>
+					</div>
+				</div>
+			</div>
+						<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/filteron map.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Filter : Effect on Map</h4>
+							<p>When a search was applied, the map was reactualized to show the filtered province. So with Filter and Display mode we can build hundreed of differents map.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/data.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Filter : Effect on Data</h4>
+							<p>When a search was applied, the data are calculate according to the filter choice. Those data are visible in a special table.</p>
+							<p>This table can be sorted ASC DES on click on the header column, The first column, show the province name which is clickable. On click the map is automaticly positionned the province selected.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/historicand reactualisation.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Refresh & Historic </h4>
+							<h6>Refresh Controls</h6>
+							<p> By default the server make a synchronisation with wargaming every hour. The first button on the left of the map force the server to make a new synchronisation with the wargaming data. This action is only allowed once time per 5 minutes, if a recent synchronisation was detected, the data are only refresh by the last save.</p>
+							<h6>Historic</h6>
+							<p> Every night, the server execute a save of the last map. The map can show those data. Only the minimal data are saved, so some view are inactived (Battles). Some basic data are saved like level, owner of province are accurate, more complex value like ELO are not historized, so the value shown are the last one.</p>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="item">
+				<div class="container">
+					<div class="col-md-8">
+						<img class="img-responsive center-block" src="img/tutorial/google earth.png" alt="Prime Iime Mode">
+						<div class="portfolio-box-caption-content">
+							<h4>Exporting Map </h4>
+							<h6>Image mode (PNG)</h6>
+							<p> The map is already rendered as an image. No direct download is possible due to CORS problem, but just make right click on map and choose "Save as" to download ur custom map</p>
+							<h6>Google Earth (KML)</h6>
+							<p> The map can be downloaded in Google Earth format. Just click on the Google earth icon on the map, a KML file is generated, open it with google earth application to view ur generated map in 3D</p>
+							
+						</div>
+					</div>
+				</div>
+			</div>
+        </div> 
+		</div>
+    </section>
+
+
+
+    <!-- Contact Us
+	============================================= -->
+    <section id="contact">
+        <div class="container">
+            <h2>Contact Me</h2>
+            <hr class="sep">			
+			<h5><a href="http://forum.worldoftanks.eu/index.php?/user/gnouffre-502094050/">To contact me, Send me a private message in wargaming forum</a></h5>
+			<h5><a href="http://forum.worldoftanks.eu/index.php?/topic/565385-cw20-viewer-website/">Link to Official TOPIC : Help me on development  (declare bug, ask new function, participate to development...) </a></h5>
+        </div>
+    </section>
+
+    <!-- Footer
+	============================================= -->
+    <footer>
+        <div class="container">
+            <h1>WOT Clan War Viewer</h1>
+            <h6>&copy; 2016 Development By Gnouffre</h6>
+        </div>
+    </footer>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script type="text/javascript" src="tools/datatables.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-assets/js/bootstrap.js"></script>
+    <!-- JS PLUGINS -->
+    <script src="plugins/owl-carousel/owl.carousel.min.js"></script>
+    <script src="js/jquery.easing.min.js"></script>
+    <script src="plugins/waypoints/jquery.waypoints.min.js"></script>
+    <script src="plugins/countTo/jquery.countTo.js"></script>
+    <script src="plugins/inview/jquery.inview.min.js"></script>
+    <script src="plugins/Lightbox/dist/js/lightbox.min.js"></script>
+    <script src="plugins/WOW/dist/wow.min.js"></script>
+	
+	<script src="tools/ol.js"></script>
+	<script src="tools/json_parse.js"></script>
+	<script src="tools/jquery-ui.min.js"></script>
+	<script src="tools/fonctionphpjs.js" type="text/javascript"></script>
+    <script type="text/javascript" src="tools/jquery.dataTables.yadcf.js"></script>
+	<script type="text/javascript" src="tools/FileSaver.min.js"></script>
+	<script type="text/javascript" src="tools/select2.full.js"></script>
+	<script src="custom.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>	
+	<script type="text/javascript" src="tools/color.prev.js"></script>
+	
+	<div id="provinceInfo" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 id='InfoPpovID' class="modal-title">Province =></h4>
+      </div>
+      <div class="modal-body">
+        
+						<div class="row">
+					<div class="col-sm-4 form-search">	
+					<h5>Province Information</h5>
+					<div id='Contenuprovince'></div>
+					</div>
+					<div class="col-sm-4 form-search">	
+					<h5>Clan Information</h5>	
+					<div id='Contenuclan'></div>
+					</div>
+					<div class="col-sm-4 form-search">	
+					<h5>Official Link</h5>
+					<div id='Contenulink'></div>
+					</div>
+				</div>
+		
+		
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+						
+<div id="filterlist" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 id='presult' class="modal-title">Result => Use Filter</h4>
+		<button type="button" class="btn btn-primary"  onclick="yadcf.exResetAllFilters(oTable);" >Reset all Filters</button>
+      </div>
+      <div class="modal-body">
+        
+						<div class="row">
+					<div class="col-sm-4 form-search">		
+					<h5>Geographical Data Filter</h5>
+					<div id="external_filter_container_0"></div>
+					<div id="external_filter_container_1"></div>
+					<div id="external_filter_container_29"></div>
+					<div id="external_filter_container_2"></div>
+					<div id="external_filter_container_3"></div>
+					<div id="external_filter_container_4"></div>
+					
+					<span id="external_filter_container_6"></span>
+					
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Revenue :</p></div> 
+						<div style="float:left;" id="external_filter_container_7"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Level : </p></div> 
+						<div style="float:left;" id="external_filter_container_8"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Battles : </p></div> 
+						<div style="float:left;" id="external_filter_container_9"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Attackers : </p></div> 
+						<div style="float:left;" id="external_filter_container_10"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Competitors:</p></div> 
+						<div style="float:left;" id="external_filter_container_11"></div>
+					<div style="clear:both;"></div><span id="external_filter_container_12"></span>
+					</div>
+					<div class="col-sm-4 form-search">	
+					<h5>Clan Filter</h5>	
+					<h6>Casual Filters</h6>	
+					<div style="clear:both;"></div><span id="external_filter_container_13"></span>
+					<div style="clear:both;"></div><span id="external_filter_container_17"></span>
+					<div style="width: 100px; float:left;"><p>Members : </p></div> 
+					<div style="float:left;" id="external_filter_container_18"></div>
+					<div style="clear:both;"></div>
+					<div style="width: 100px; float:left;"><p>Nb Prov : </p></div> 
+					<div style="float:left;" id="external_filter_container_28"></div>
+					<div style="clear:both;"></div>
+					</div>
+					<div class="col-sm-4 form-search">	
+					<h5></h5>	
+					<h6>Statistic Filters</h6>						
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>ELO 6 : </p></div> 
+						<div style="float:left;" id="external_filter_container_14"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>ELO 8 : </p></div> 
+						<div style="float:left;" id="external_filter_container_15"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>ELO 10 : </p></div> 
+						<div style="float:left;" id="external_filter_container_16"></div>
+					<div style="clear:both;"></div>
+					
+						<div style="width: 100px; float:left;"><p>Battles : </p></div> 
+						<div style="float:left;" id="external_filter_container_19"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Battles 6 : </p></div> 
+						<div style="float:left;" id="external_filter_container_20"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Battles 8 : </p></div> 
+						<div style="float:left;" id="external_filter_container_21"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Battles 10 : </p></div> 
+						<div style="float:left;" id="external_filter_container_22"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Wins : </p></div> 
+						<div style="float:left;" id="external_filter_container_23"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Wins 6 : </p></div> 
+						<div style="float:left;" id="external_filter_container_24"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Wins 8 : </p></div> 
+						<div style="float:left;" id="external_filter_container_25"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Wins 10 : </p></div> 
+						<div style="float:left;" id="external_filter_container_26"></div>
+					<div style="clear:both;"></div>
+						<div style="width: 100px; float:left;"><p>Losses : </p></div> 
+						<div style="float:left;" id="external_filter_container_27"></div>
+					<div style="clear:both;"></div>
+					
+						<div style="width: 100px; float:left;"><p>Captures : </p></div> 
+						<div style="float:left;" id="external_filter_container_30"></div>
+					
+					</div>
+				</div>
+		
+		
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+	
+	
+</body>
+
+</html>
