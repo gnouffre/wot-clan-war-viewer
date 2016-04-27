@@ -7,7 +7,8 @@ Branch : [ WotCWV-v1.1 ](https://github.com/gnouffre/wot-clan-war-viewer/tree/Wo
 Work to do :
 - Modal windows for clan stat.
 - Refresh Clan stat info
-- Work on performance
+- Work on performance 
+- Bug on icon scale
 
 
 This site allow to build and save map of clan war 2.0 with different display mode (clan, revenu, level, language...), and different filter mode.
