@@ -32,6 +32,7 @@
 	var layers ;
 	var vector ;  
 	var varlayersource ;
+	var chargedgeojson;
 	
 	// Creating datatable, they are charged after the loading data from php, in order season, clan, province.
 	showLogSeason();
@@ -318,9 +319,7 @@ function chargerlalistesave()   {
    // until LOAD is not finished we show the preloader
    setTimeout(function() {
    preloader.show();
-   layers = map.getLayers().getArray() ;
-   vector = getLayerwarg(layers, "wargaming"); 
-   map.removeLayer(vector);
+   
    
   if (save == dernieresave) {
    $('#ModeAffichage option[value="Batailles"]').removeAttr('disabled'); 
@@ -343,6 +342,13 @@ function chargerlalistesave()   {
    } else {
    var lamapsave = 'tools/map/europemap.geojson';
    };
+   layers = map.getLayers().getArray() ;
+   vector = getLayerwarg(layers, "wargaming"); 
+   // optimization : reload geojson map only if change 
+   if (chargedgeojson !=  listeinfos['season_id'])
+   {
+   
+   map.removeLayer(vector);
    cartecomplete = new ol.layer.Image({
 	        idbase : "wargaming",
             source: new ol.source.ImageVector({
@@ -365,6 +371,7 @@ function chargerlalistesave()   {
    map.addLayer(cartecomplete);
    layers = map.getLayers().getArray() ;
    vector = getLayerwarg(layers, "wargaming"); 
+   };
    	 varlayersource = vector.getSource().getSource();
 var listenerchangelayer = varlayersource.once('change',function(e){
     if (varlayersource.getState() === 'ready') {
