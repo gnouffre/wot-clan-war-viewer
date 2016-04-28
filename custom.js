@@ -6,7 +6,7 @@
 	
 	// WAITING until site was ready.
 	var preloader = $('#preloader');
-	preloader.show();
+	$('#preloaderPage').show();
 	
 	
 	// GLOBAL VARIABLE
@@ -170,6 +170,7 @@ chargerlalistesave();
 
 // On page load, we use the most recent save.
 chargerlasave(dernieresave);
+$('#preloaderPage').hide();
 
 // ----------------------EVENT ------------------------>>
 

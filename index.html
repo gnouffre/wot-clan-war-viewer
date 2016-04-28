@@ -306,6 +306,30 @@ width: 100px;
   margin-left: -15px;
   display: inline-block;
 }
+
+    /* ==========================================================================
+Preloader map Style
+========================================================================== */
+.preloader2 {
+  position: absolute;
+  z-index: 999999;
+  width: 80%;
+  height: 100%;
+  background: #24242a;
+  opacity: 0.3;
+}
+.preloader2 i {
+  color: #fff;
+  position: absolute;
+  font-size: 36px;
+  line-height: 36px;
+  top: 50%;
+  left: 50%;
+  height: 36px;
+  width: 36px;
+  display: inline-block;
+}
+
 .nonentouree {
     padding: 4px;
     margin: 5px;
@@ -435,16 +459,15 @@ width: 100px;
 <body>
     <!-- Preloader
 	============================================= -->
-     <div class="preloader" id="preloader" hidden>
-	<div class='preloader-container'>
-	<i class="fa fa-circle-o-notch fa-spin fa-2x"></i><span> <font color="white">Loading Data...</font></span>
-
-</div>
-	</div>
+    
 	     <div class="preloader" id="preloadersync" hidden>
 	<div class='preloader-container'>
 	<i class="fa fa-refresh fa-spin fa-2x"></i><span> <font color="white">Synchronization with Wargaming...</font></span>
-
+</div>
+	</div>
+		     <div class="preloader" id="preloaderPage" hidden>
+	<div class='preloader-container'>
+	<i class="fa fa-circle-o-notch fa-spin fa-2x"></i><span> <font color="white">Loading...</font></span>
 </div>
 	</div>
 	<div class="preloader" id="building" hidden>
@@ -622,9 +645,10 @@ width: 100px;
 						
 				</div>		
 				<div class="col-lg-10">
-				
-					<div id="map" class="map"></div>
-					<div id="loading-div" style="position: absolute" hidden><div>Chargement en cours</div><div style="margin : 0 auto;"><img style="display: block; margin-left: auto; margin-right: auto" src="img/ajax-loader.gif"></div></div>
+				 
+				<div id="map" class="map"><div class="preloader2" id="preloader" hidden>
+				<i class="fa fa-spinner fa-spin fa-2x"></i><span> <font color="white">Loading Data...</font></span>
+					</div></div>
 				</div>	
 			</div>	
     </section>
