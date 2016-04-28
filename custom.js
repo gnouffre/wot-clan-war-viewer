@@ -158,44 +158,40 @@
 	$( document ).ajaxSuccess(function( event, xhr, settings ) {
 	if ( settings.data.includes("SEASONDATA"))  {
      seasondata = JSON.parse(xhr.responseText);
+	 loadLogSeason();
 	}
     if ( settings.data.includes("CLANLIST"))  {
      annuaireclan = JSON.parse(xhr.responseText);
+	 loadLogClan();
 	}
      if ( settings.data.includes("ALLSAVE"))  {
      listesaveresult = JSON.parse(xhr.responseText);
+	if ($( "#choixSave" ).val() === null) {
+	$("#choixSave").val('extraction.json').change();
+	chargerlasave('extraction.json');
+	}
 	//ordered desc by php
 	chargerlalistesave();
 	} 
      if ( settings.data.includes("LASTSAVE"))  {
-     dernieresave = xhr.responseText;
+     dernieresave = $.extend( {}, xhr.responseText );
 	// On page load, we use the most recent save.
-	// does not work, push to ajax stop with condition... se remark
-	//$( "#choixSave" ).val(dernieresave);
-	chargerlasave(dernieresave);
+	// does not work, push to ajax stop with condition... 
+	
 	} 
 	 if ( settings.data.includes("DATELASTSAVE"))  {
-     datedernieresave = xhr.responseText;
-	} 
+     datedernieresave = $.extend( {}, xhr.responseText );
+	}
+	
 	});
 
 	// when all AJAX are stopped.
     $( document ).ajaxStop(function() {
 	// Creating datatable, they are charged after the loading data from php
-	// season and clan are loaded at start only, province is loaded when a save is loaded only.
-	
+	// season and clan are loaded at start only, province is loaded when a save is loaded only.	
 		// really poor code , maybe better to do
 	// due to ajax async, i can try to put lastsave while select save was empty, so the select is void on first load of page
-	if ($( "#choixSave" ).val() == '') {
-	$("#choixSave").val(dernieresave).change();
-	}
-	
-	loadLogSeason();
-	loadLogClan();
-    
 	$('#preloaderPage').hide();
-	
-
     });
 	
 
@@ -307,19 +303,21 @@ dernieresave = affichageclanproperty("LASTSAVE", " ", true);
  var resultatajax = "";
   setTimeout(function() {
   $('#preloadersync').show();
+  
                     $.ajax({
                     type: 'POST',
                             url: 'tools/extracthour.php',
                             success: function(result) {
-                            resultatajax = result;							
+                            resultatajax = result;	
+							 $('#preloadersync').hide();
 							//window.location.reload(false); 
-							datedernieresave = affichageclanproperty("DATELASTSAVE", " ", true);
-							dernieresave = affichageclanproperty("LASTSAVE", " ", true);
+							datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);
+							dernieresave = affichageclanproperty("LASTSAVE", " ", false);
+							$("#choixSave").val(dernieresave).change();
                             },
                             dataType: 'text',
-                            async:true
+                            async:false
                     });
-					 $('#preloadersync').hide();
                     return resultatajax;
 	     					
       }, 100);
