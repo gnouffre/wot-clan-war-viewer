@@ -126,7 +126,7 @@ $pageidc2 = "https://api.worldoftanks.eu/wot/globalmap/provinces/?application_id
 $data2page = get_page($pageidc2);
 $data2 = json_decode($data2page, true);
 echo $data2['status'];
-if ($data2['status'] !== 'error') {
+if ($data2['status'] == 'error') {
 echo $data2page;
 }
 echo '</br>NEW LOT PROVINCE --------->'."&page_no=" . $j .'</br>';
