@@ -56,12 +56,13 @@ foreach ($files as $file) {
 $nomfichier = str_replace(".json", "", basename('../extract/'.$file));
 if ($nomfichier == 'extraction') {
 $date2 =  date("Y_m_d H:i:s.", filectime('../extract/'.$file));
+$dateshow = (date("Y_m_d", filectime('../extract/'.$file)) . " Online");
 } else {
 $date2 = str_replace("extraction", "", $nomfichier);
+$dateshow = $date2 ;
 }
 $date =  date("d/m/Y H:i:s.", filectime('../extract/'.$file));
-$infos [$i] = array( "fichier" => $file, "date" => $date2, "datetri" => $date );
-$datefile[$i] = $date;
+$infos [$i] = array( "fichier" => $file, "date" => $date2, "dateshow" => $dateshow );
 $i++;
 }
 //rsort ($infos);

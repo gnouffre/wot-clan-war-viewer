@@ -8,7 +8,6 @@
 	var preloader = $('#preloader');
 	$('#preloaderPage').show();
 	
-	
 	// GLOBAL VARIABLE
     var languages = ["afrikaans", "arabic", "basque", "belarusian", "bulgarian", "catalan", "croatian", "czech", "danish", "dutch", "english", "esperanto", "estonian", "faroese", "finnish", "french", "galician", "german", "greek", "hebrew", "hindi", "hungarian", "icelandic", "indonesian", "irish", "italian", "japanese", "khmer", "korean", "latvian", "lithuanian", "luxembourgish", "malay", "mongolian", "norwegian", "persian", "polish", "portuguese", "romanian", "russian", "serbian", "slovak", "slovene", "spanish", "swedish", "turkish", "ukrainian", "vietnamese", "wargaming"];		
 	var clanTable;
@@ -59,7 +58,7 @@
 	// Button image : Blob/canvas export dont work due to CORS problems, just an alert....
 	   window.app = {};
        var app = window.app;
-        app.pdf = function() {
+app.pdf = function() {
         var button = document.createElement('button');
         button.innerHTML = '<img src="tools/images/pdf_icon.png" />';
 		button.title = 'Save Image : plz do right click on map';
@@ -77,7 +76,7 @@
 
 		
 		// BUTTON EXPORT KML : prepare data to format KML, then blob it in a file for download.
-	    app.google = function() {
+app.google = function() {
         var button = document.createElement('button');
         button.innerHTML = '<img src="tools/images/Google_Maps_Icon.png" />';
 		button.title = 'Export format Google Earth';
@@ -131,7 +130,7 @@
 		ol.inherits(app.google, ol.control.Control);
 		 
 	  // OPEN LAYER MAP PREPARE
-      var map = new ol.Map({
+var map = new ol.Map({
 	  RendererType: 'canvas',
 	     controls: ol.control.defaults().extend([
 		  new app.pdf(),
@@ -175,7 +174,7 @@ $('#preloaderPage').hide();
 // ----------------------EVENT ------------------------>>
 
  // click et double click sur la carte
-      var selectEuropa = new ol.style.Style({
+var selectEuropa = new ol.style.Style({
           stroke: new ol.style.Stroke({
           color: '#ff0000',
           width: 6
@@ -183,7 +182,7 @@ $('#preloaderPage').hide();
 		zIndex: 1
       });
 	   // mouse move sur la carte
-      var selectEuropa2 = new ol.style.Style({
+var selectEuropa2 = new ol.style.Style({
           stroke: new ol.style.Stroke({
           color: '#ff0000',
           width: 2
@@ -216,14 +215,14 @@ var mouseInteraction = new ol.interaction.Pointer({
 });
 
 		// click on map	
-	    var keyclik =   map.on('click', function(evt) {
+var keyclik =   map.on('click', function(evt) {
         var pixel = evt.pixel;
 		var provcoord = evt.coordinate;
 		displayFeature(pixel, provcoord );		
       });
 	    
 		
-	  map.getView().on('propertychange', function(e) {
+map.getView().on('propertychange', function(e) {
 	  // when the view of map change , for exemple change of zoom level
 	  // we need to compute the image scale
    switch (e.key) {
@@ -266,8 +265,9 @@ date_evenement.setMinutes(03);
 var total_secondes = (date_evenement - date_actuelle) / 1000;
 // no build, reload	
 if (total_secondesreact < 300 || total_secondes < 300) {
-	window.location.reload(false);
+//	window.location.reload(false);
 datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);	
+chargerlasave(dernieresave);
 	}
 	// build
 	else {
@@ -279,8 +279,9 @@ datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);
                             url: 'tools/extracthour.php',
                             success: function(result) {
                             resultatajax = result;							
-							window.location.reload(false); 
+							//window.location.reload(false); 
 							datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);	
+							chargerlasave(dernieresave);
                             },
                             dataType: 'text',
                             async:false
@@ -310,7 +311,7 @@ function chargerlalistesave()   {
      $('#choixSave')
          .append($("<option></option>")
          .attr("value",listesaveresult[save].fichier)
-         .text(listesaveresult[save].date)); 	 
+         .text(listesaveresult[save].dateshow)); 	 
 	});
   };
   
