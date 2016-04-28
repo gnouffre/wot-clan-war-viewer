@@ -51,7 +51,7 @@ echo "contenu : " . $infosrefresh;
 buildmap(150);
 
 }
-else if($heureducron != 3 && $heureducron != 2 && $heureducron != 1) {
+elseif($heureducron != 3 && $heureducron != 2 && $heureducron != 1) {
 
 
 // sauvegarde horaire
@@ -66,7 +66,7 @@ fputs($fichierjson, $infoamettre);
 fclose($fichierjson);
 buildmap(50);
 
-} else if($heureducron == 2 || $heureducron == 1 ) {
+} elseif($heureducron == 2 || $heureducron == 1 ) {
 //refresh de la carte a faire
 buildmap(150);
 }
@@ -84,10 +84,7 @@ function get_info2($cluster) {
 $season_id = 'europemap';	
 $pageidc = "https://api.worldoftanks.eu/wot/globalmap/seasons/?application_id=" . $cluster . '&status=ACTIVE';
 $data = get_page($pageidc);
-echo 'saison' .$data;
 $data = json_decode($data, true);
-echo 'status' .$data['status'];
-echo 'status' .$data['data']['status'];
 echo 'season_id' .$data['data'][0]['season_id'];
 if ($data['status'] == 'ok' && $data['data'][0]['status'] == 'ACTIVE' ) {
 $season_id = $data['data'][0]['season_id'];
@@ -117,7 +114,7 @@ $listeclanssurcartep2 = [];
 foreach ($frontlist as $front) {		
 $frontid =  $data3['data'][$front]['front_id']	;		
 		// troisieme partie : liste provinces
-echo '</br>NEW FRONTLIST --------->'.$data3['data'][$front]['front_id'].' </br>';	
+echo 'NEW FRONTLIST --------->'.$data3['data'][$front]['front_id'];	
 $k = 0;
 
 $j= 0;
@@ -126,8 +123,12 @@ $data2['meta']['count'] = 100;
 while ($data2['status'] == 'ok' and $data2['meta']['count'] > 0) {
 $j++;
 $pageidc2 = "https://api.worldoftanks.eu/wot/globalmap/provinces/?application_id=" . $cluster . "&language=en&front_id=" .$frontid . "&page_no=" . $j ;
-$data2 = get_page($pageidc2);
-$data2 = json_decode($data2, true);
+$data2page = get_page($pageidc2);
+$data2 = json_decode($data2page, true);
+echo $data2['status'];
+if ($data2['status'] !== 'error') {
+echo $data2page;
+}
 echo '</br>NEW LOT PROVINCE --------->'."&page_no=" . $j .'</br>';
 $provincelist = array_keys($data2['data']);
 
@@ -191,7 +192,6 @@ $provinceencours = $data2['data'][$province]['province_id'];
 				$arraylisteclanssurcarte = array_keys($listeclanssurcarte);
 				while ($numclan < count($listeclanssurcarte ) && $nbpassage < 5 ) {
 					$ind = 0;
-					echo 'count clan' .count($listeclanssurcarte) . 'dernier passage' .$numclan . json_encode($listeclanssurcarte);
 					$listeclanAPI = '';
 					for ($ind = 0; $ind < 10 && $numclan <= count($listeclanssurcarte) ; $ind++) {
 					
@@ -238,7 +238,6 @@ foreach ($clanlist as $clannew) {
 			   $wins_8_level = $data4["data"][$clannew]["statistics"]["wins_8_level"]; 
 			   
 			   $description = $data3["data"][$clannew]["description"]; 
-				echo 'description' .$description;
 				$langage = detect_lang($description);
 				$annuaireclan[$clanl]['language'] = $langage;
 				
@@ -282,14 +281,11 @@ foreach ($clanlist as $clannew) {
 				// les clans ne sont pas trouvé dans le cas event il faut passer par la methode officielle
 				//nb passage a 10 ne passe pas sur le serveur avec 2 appel API (soit 20 appel API)
 				// 7 non plus
-				 echo '</br> refresh clan avant tri ' .json_encode($listeclanssurcartep2) .'</br>';
 				usort($listeclanssurcartep2, 'date_compare');
 				$arraylisteclanssurcarte = array_keys($listeclanssurcartep2);
-				echo '</br> refresh clan' .json_encode($listeclanssurcartep2) .'</br>';
 					
 				while ($numclan < count($arraylisteclanssurcarte ) && $nbpassage < 5 ) {
 					$ind = 0;
-					echo 'count clan' .count($arraylisteclanssurcarte) . 'dernier passage' .$numclan;
 					$listeclanAPI = '';
 					for ($ind = 0; $ind < 10 && $numclan <= count($arraylisteclanssurcarte) ; $ind++) {
 					
@@ -338,7 +334,6 @@ foreach ($clanlist as $clannew) {
 			   $wins_8_level = $data4["data"][$clannew]["statistics"]["wins_8_level"]; 
 			   
 			   $description = $data3["data"][$clannew]["description"]; 
-				echo 'description' .$description;
 				$langage = detect_lang($description);
 				$annuaireclan[$clanl]['language'] = $langage;
 				
@@ -370,7 +365,6 @@ foreach ($clanlist as $clannew) {
 				'$daterefresh' => $madate 
 				
 				);
-				echo json_encode($clan_a_creer);
 			$annuaireclan[$clanl] = $clan_a_creer;
 				
 			   };
@@ -452,9 +446,9 @@ function get_coordonate($province_id) {
 
 
 $pageidp = "https://cwxstatic-eu.wargaming.net/v25/provinces_geojson/" . $province_id . ".json";
-    $data2 = get_page($pageidp);
-    $data2 = json_decode($data2, true);	
-	$geom = $data2['geom'];
+    $data4 = get_page($pageidp);
+    $data4dat = json_decode($data4, true);	
+	$geom = $data4dat['geom'];
 return $geom ;
 
 
