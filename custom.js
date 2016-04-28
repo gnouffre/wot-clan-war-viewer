@@ -1364,7 +1364,9 @@ map.addLayer(clusters);
 
 
 function affichagefront() {
-// same as affichageclancolor	
+// same as affichageclancolor
+var vector = getLayerwarg(layers, "texte3"); 
+map.removeLayer(vector);	
 var vector = getLayerwarg(layers, "wargaming");  	 
 var varlayersource = vector.getSource().getSource();
 var layerfeatures = new 	ol.source.Vector();		  
@@ -1461,12 +1463,14 @@ var newFeature = new ol.Feature({
 $.each(Object.keys(sourcestylelist), function(index, source) {
 	extentWARN = sourcestylelist[source].getExtent();
     center2Layers = ol.extent.getCenter(extentWARN);
+	if (isNaN(center2Layers[0]) == false && isNaN(center2Layers[1]) == false) {
 	var newFeaturetext = new ol.Feature({           
             geometry: new ol.geom.Point(center2Layers)
           });
 	 newFeaturetext.setStyle(styleText[source]);
 	 nouvellesource.addFeature(newFeaturetext);
     //alert(center2Layers);
+	}
 });
 };
 
@@ -1726,6 +1730,8 @@ if ( result3[0] ) {
 
 function affichagehoraires() {	
 // same as affichageclancolor : layer use random color for each distinct PRIME TIME
+var vector = getLayerwarg(layers, "texte3"); 
+map.removeLayer(vector);
 var vector = getLayerwarg(layers, "wargaming");  	 
 var varlayersource = vector.getSource().getSource();
 var layerfeatures = new 	ol.source.Vector();		  
@@ -1821,12 +1827,14 @@ var newFeature = new ol.Feature({
 $.each(Object.keys(sourcestylelist), function(index, source) {
 	extentWARN = sourcestylelist[source].getExtent();
     center2Layers = ol.extent.getCenter(extentWARN);
+	if (isNaN(center2Layers[0]) == false && isNaN(center2Layers[1]) == false) {
 	var newFeaturetext = new ol.Feature({           
             geometry: new ol.geom.Point(center2Layers)
           });
 	 newFeaturetext.setStyle(styleText[source]);
 	 nouvellesource.addFeature(newFeaturetext);
     //alert(center2Layers);
+	}
 });
 };
 
