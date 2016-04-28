@@ -42,7 +42,7 @@ uasort($listeclan, function ($a, $b){
 } elseif ((isset($typeselection) && $typeselection == "LOADSAVE" )) {
   
 $fichierextraction = "../extract/".$_POST['clanid'];
-$fichierjson = fopen($fichierextraction, 'a+');
+$fichierjson = fopen($fichierextraction, 'r+');
 $infosrefresh = fread($fichierjson, filesize($fichierextraction));
 fclose($fichierjson);
 
