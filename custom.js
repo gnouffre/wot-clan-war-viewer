@@ -1434,6 +1434,8 @@ stylecache[lefronttrouve]  = new ol.style.Style({
 styleText[lefronttrouve]  = new ol.style.Style({
 					text: new ol.style.Text({
 						  text: provinceatraiter['front_name'],
+						  textAlign: "center",
+                        textBaseline: "Middle",
 						  font: 'bold 24px Arial, Verdana, Helvetica, sans-serif',
 						  fill: new ol.style.Fill({
 							color: '#fff'
@@ -1800,6 +1802,8 @@ if (!styleText[indicetab]) {
 styleText[indicetab]  = new ol.style.Style({
 					text: new ol.style.Text({
 						  text: provinceatraiter['prime_time'],
+						  textAlign: "center",
+                        textBaseline: "Middle",
 						  font: 'bold 24px Arial, Verdana, Helvetica, sans-serif',
 						  fill: new ol.style.Fill({
 							color: '#fff'
