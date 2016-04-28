@@ -2207,12 +2207,12 @@ oTable = $(idlog).DataTable( {
 									bAutoWidth : true,
 									sDom: '<r>t<fi>',
 		 columns : [
-            { title: "Province" , data: "province_name" },
+            { title: "Province", data: "province_name" },
             { title: "Owner", data: "owner_clan_id" },
             { title: "Clan color", data: "clancolor", "bVisible": false },
-			{ title: "Front" , data: "front_name" },
-            { title: "Prime time" , data: "prime_time" },
-            { title: "Landing type" , data: "landing_type" },
+			{ title: "Front", data: "front_name" },
+            { title: "Prime time", data: "prime_time" },
+            { title: "Landing type", data: "landing_type" },
             { title: "Server", data: "server" , "bVisible": false },
             { title: "Status", data: "status" },
             { title: "Revenue", data: "daily_revenue" },
@@ -2243,7 +2243,7 @@ oTable = $(idlog).DataTable( {
     } );	
 var columnheader = oTable.columns().header();
 var titlecolumns = $.map(columnheader, function(node) {
-    return node.innerText;
+    return node.textContent;
    });
 // table change detected : sync data clan and redraw map   
 oTable.on( 'search.dt', function () {
@@ -2273,7 +2273,6 @@ oTable.on( 'search.dt', function () {
 	ModeAffichage(modAff);
 	});
 	$('select[id^= "yadcf-filter-"][class*="select2"]').each(function() {
-	console.log($( this ));
   $( this ).select2("close");
 });
 });
