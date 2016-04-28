@@ -93,7 +93,7 @@ app.google = function() {
 				var varlayersource = layer.getSource().getSource();
 				features = $.merge(features, varlayersource.getFeatures());
             }  
-			if (layer.get('idbase') == 'icone' || layer.get('idbase') == 'texte2') {
+			if (layer.get('idbase') == 'icone' || layer.get('idbase') == 'texte2' || layer.get('idbase') == 'texte3'  ) {
 				var varlayersource = layer.getSource();
 				features = $.merge(features, varlayersource.getFeatures());
             }
@@ -1389,22 +1389,33 @@ var layer = new ol.layer.Image({
           });
 map.addLayer(layer);
 
+var layer2 = new ol.layer.Vector({
+            idbase : "texte3",
+            source: new ol.source.Vector({
+            })
+          });
+map.addLayer(layer2);
+var nouvellesource = layer2.getSource();
 
-// recherche des infos			  
-
+// recherche des infos			 
+var sourcestylelist = new Array;
 var stylecache = new Array;
+var styleText = new Array;
 // boucle sur les fronts //	
-var numItems = $("#tabs-9tab").DataTable().column(2).data().unique().length;
-
+var numItems = $("#tabs-9tab").DataTable().column(3).data().unique().length;
 var color1 = [255,0, 0];
 var color2 = [0, 0, 255];
 var colorlist = generateGradient(color1, color2 ,numItems);
 var lastaffected = 0;
 $.each(listeinfos['provinces'], function(index, province) {
-
+// transform in front id to be usable as index tab
 var provinceatraiter = listeinfos['provinces'][index];
-var lefronttrouve = provinceatraiter['front_name'];
-
+var resultfront = $.grep(Object.keys(listeinfos['front']), function(e){ return listeinfos['front'][e].front_name == provinceatraiter['front_name']});
+if (resultfront[0]) {
+var lefronttrouve = listeinfos['front'][resultfront[0]].front_id;
+} else {
+var lefronttrouve = 'invalide';
+}
 if (!stylecache[lefronttrouve]) {
 
 stylecache[lefronttrouve]  = new ol.style.Style({
@@ -1418,14 +1429,45 @@ stylecache[lefronttrouve]  = new ol.style.Style({
                });
 			   lastaffected = lastaffected + 1;
 			   };
+styleText[lefronttrouve]  = new ol.style.Style({
+					text: new ol.style.Text({
+						  text: provinceatraiter['front_name'],
+						  font: 'bold 24px Arial, Verdana, Helvetica, sans-serif',
+						  fill: new ol.style.Fill({
+							color: '#fff'
+						  }),
+						  	stroke: new ol.style.Stroke({
+							color: '#000'
+						  })
+						})
+               });		   
+	
+// new vector build to be able to compute center of each front and place Text
+sourcestylelist[lefronttrouve] = new ol.source.Vector();			   
+		   
 		   
  var result3 = $.grep(features, function(e){ return e.getProperties().province_id == provinceatraiter['province_id']});
 if ( result3[0] ) {
  result3[0].setStyle(stylecache[lefronttrouve]);
-
+var geometry = result3[0].getGeometry();
+var center = getCenterOf(geometry); 
+var newFeature = new ol.Feature({           
+            geometry: new ol.geom.Point(center)
+          });			   
+ sourcestylelist[lefronttrouve].addFeature(newFeature); 
  };
  }); 
-
+// now each province are colored we will add for each style a text to display front information
+$.each(Object.keys(sourcestylelist), function(index, source) {
+	extentWARN = sourcestylelist[source].getExtent();
+    center2Layers = ol.extent.getCenter(extentWARN);
+	var newFeaturetext = new ol.Feature({           
+            geometry: new ol.geom.Point(center2Layers)
+          });
+	 newFeaturetext.setStyle(styleText[source]);
+	 nouvellesource.addFeature(newFeaturetext);
+    //alert(center2Layers);
+});
 };
 
 
@@ -1705,7 +1747,18 @@ var layer = new ol.layer.Image({
               })
             })
           });
-map.addLayer(layer);var stylecache = new Array;
+map.addLayer(layer);
+var stylecache = new Array;		 
+var sourcestylelist = new Array;
+var styleText = new Array;
+var layer2 = new ol.layer.Vector({
+            idbase : "texte3",
+            source: new ol.source.Vector({
+            })
+          });
+map.addLayer(layer2);
+var nouvellesource = layer2.getSource();
+
 var numItems = $("#tabs-9tab").DataTable().column(4).data().unique().length;
 var color1 = [255,0, 0];
 var color2 = [0, 0, 255];
@@ -1713,9 +1766,18 @@ var colorlist = generateGradient(color1, color2 ,numItems);
 var lastaffected = 0;
 $.each(listeinfos['provinces'], function(index, province) {
 var provinceatraiter = listeinfos['provinces'][index];
-var lefronttrouve = provinceatraiter['prime_time'];
-if (!stylecache[lefronttrouve]) {
-stylecache[lefronttrouve]  = new ol.style.Style({
+var resultfront = $.grep(Object.keys(listeinfos['front']), function(e){ return listeinfos['front'][e].front_name == provinceatraiter['front_name']});
+if (resultfront[0]) {
+var lefronttrouve = listeinfos['front'][resultfront[0]].front_id;
+} else {
+var lefronttrouve = 'invalide';
+}
+
+var leprimetimetrouve = provinceatraiter['prime_time'].substring(0, 3);
+var indicetab = leprimetimetrouve + lefronttrouve;
+
+if (!stylecache[leprimetimetrouve]) {
+stylecache[leprimetimetrouve]  = new ol.style.Style({
                  fill: new ol.style.Fill({
                    color: [colorlist[lastaffected][0], colorlist[lastaffected][1],colorlist[lastaffected][2],  0.8]
                  }),
@@ -1724,13 +1786,48 @@ stylecache[lefronttrouve]  = new ol.style.Style({
                    width: 1
                  })
                });			   
-			   lastaffected = lastaffected + 1;
-			   };		   
+			   lastaffected = lastaffected + 1;			   
+			   };
+
+if (!styleText[indicetab]) {
+
+styleText[indicetab]  = new ol.style.Style({
+					text: new ol.style.Text({
+						  text: provinceatraiter['prime_time'],
+						  font: 'bold 24px Arial, Verdana, Helvetica, sans-serif',
+						  fill: new ol.style.Fill({
+							color: '#fff'
+						  }),
+						  	stroke: new ol.style.Stroke({
+							color: '#000'
+						  })
+						})
+               });
+// new vector build to be able to compute center of each front and place Text
+sourcestylelist[indicetab] = new ol.source.Vector();			   
+			   };			   
  var result3 = $.grep(features, function(e){ return e.getProperties().province_id == provinceatraiter['province_id']});
 if ( result3[0] ) {
- result3[0].setStyle(stylecache[lefronttrouve]);
+ result3[0].setStyle(stylecache[leprimetimetrouve]);
+ var geometry = result3[0].getGeometry();
+var center = getCenterOf(geometry); 
+var newFeature = new ol.Feature({           
+            geometry: new ol.geom.Point(center)
+          });			   
+ sourcestylelist[indicetab].addFeature(newFeature); 
  };
  }); 
+ // now each province are colored we will add for each style a text to display front prime time information
+$.each(Object.keys(sourcestylelist), function(index, source) {
+	extentWARN = sourcestylelist[source].getExtent();
+    center2Layers = ol.extent.getCenter(extentWARN);
+	var newFeaturetext = new ol.Feature({           
+            geometry: new ol.geom.Point(center2Layers)
+          });
+	 newFeaturetext.setStyle(styleText[source]);
+	 nouvellesource.addFeature(newFeaturetext);
+    //alert(center2Layers);
+});
 };
 
 
@@ -1984,6 +2081,8 @@ function effacericone() {
 var vector = getLayerwarg(layers, "icone");   
 map.removeLayer(vector);
 var vector = getLayerwarg(layers, "texte2");   
+map.removeLayer(vector);
+var vector = getLayerwarg(layers, "texte3");   
 map.removeLayer(vector);
 var vector = getLayerwarg(layers, "texte"); 
 map.removeLayer(vector);
