@@ -38,27 +38,12 @@
 	showLogClan();
 	showLogTab9('#tabs-9tab');
 	
-	// LOADING Data from PHP
-	var seasondata = JSON.parse(affichageclanproperty("SEASONDATA", " ", false));
-	var annuaireclan = JSON.parse(affichageclanproperty("CLANLIST", " ", false));	
-	var listesaveresult = JSON.parse(affichageclanproperty("SAVE", " ", false));
-	var dernieresave = affichageclanproperty("LASTSAVE", " ", false);
-	var datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);
-	
-	// Creating datatable, they are charged after the loading data from php
-	// season and clan are loaded at start only, province is loaded when a save is loaded only.
-	loadLogSeason();
-	loadLogClan();
-
-	
-    // Prepare BUTTON CONTROL on map : image / kml
+	 // Prepare BUTTON CONTROL on map : image / kml
 	// -------------------------------------------
-
-
 	// Button image : Blob/canvas export dont work due to CORS problems, just an alert....
 	   window.app = {};
        var app = window.app;
-app.pdf = function() {
+       app.pdf = function() {
         var button = document.createElement('button');
         button.innerHTML = '<img src="tools/images/pdf_icon.png" />';
 		button.title = 'Save Image : plz do right click on map';
@@ -72,11 +57,9 @@ app.pdf = function() {
 		ol.control.Control.call(this, {
           element: element
         });
-		};
-
-		
+		};	
 		// BUTTON EXPORT KML : prepare data to format KML, then blob it in a file for download.
-app.google = function() {
+        app.google = function() {
         var button = document.createElement('button');
         button.innerHTML = '<img src="tools/images/Google_Maps_Icon.png" />';
 		button.title = 'Export format Google Earth';
@@ -130,7 +113,7 @@ app.google = function() {
 		ol.inherits(app.google, ol.control.Control);
 		 
 	  // OPEN LAYER MAP PREPARE
-var map = new ol.Map({
+	var map = new ol.Map({
 	  RendererType: 'canvas',
 	     controls: ol.control.defaults().extend([
 		  new app.pdf(),
@@ -158,20 +141,70 @@ var map = new ol.Map({
       });
 
 
-$(document).ready(function(){ 
-// search all save then load the select list of Date available. (ordered desc by php)
-chargerlalistesave();
-    $( "#choixSave" ).change (function() {
 	
+	// LOADING Data from PHP
+	var seasondata;
+	var annuaireclan;
+	var listesaveresult;
+	var listesaveresult;
+	var dernieresave;
+	var datedernieresave;
+	affichageclanproperty("SEASONDATA", " ", true);
+	affichageclanproperty("CLANLIST", " ", true);	
+	affichageclanproperty("ALLSAVE", " ", true);
+	affichageclanproperty("LASTSAVE", " ", true);
+	affichageclanproperty("DATELASTSAVE", " ", true);
+
+	$( document ).ajaxSuccess(function( event, xhr, settings ) {
+	if ( settings.data.includes("SEASONDATA"))  {
+     seasondata = JSON.parse(xhr.responseText);
+	}
+    if ( settings.data.includes("CLANLIST"))  {
+     annuaireclan = JSON.parse(xhr.responseText);
+	}
+     if ( settings.data.includes("ALLSAVE"))  {
+     listesaveresult = JSON.parse(xhr.responseText);
+	//ordered desc by php
+	chargerlalistesave();
+	} 
+     if ( settings.data.includes("LASTSAVE"))  {
+     dernieresave = xhr.responseText;
+	// On page load, we use the most recent save.
+	// does not work, push to ajax stop with condition... se remark
+	//$( "#choixSave" ).val(dernieresave);
+	chargerlasave(dernieresave);
+	} 
+	 if ( settings.data.includes("DATELASTSAVE"))  {
+     datedernieresave = xhr.responseText;
+	} 
+	});
+
+	// when all AJAX are stopped.
+    $( document ).ajaxStop(function() {
+	// Creating datatable, they are charged after the loading data from php
+	// season and clan are loaded at start only, province is loaded when a save is loaded only.
+	
+		// really poor code , maybe better to do
+	// due to ajax async, i can try to put lastsave while select save was empty, so the select is void on first load of page
+	if ($( "#choixSave" ).val() == '') {
+	$("#choixSave").val(dernieresave).change();
+	}
+	
+	loadLogSeason();
+	loadLogClan();
+    
+	$('#preloaderPage').hide();
+	
+
+    });
+	
+
+	
+// ----------------------EVENT ------------------------>>
+   // change save selection
+    $( "#choixSave" ).change (function() {
 	   chargerlasave($( this ).val());
        })
-});
-
-// On page load, we use the most recent save.
-chargerlasave(dernieresave);
-$('#preloaderPage').hide();
-
-// ----------------------EVENT ------------------------>>
 
  // click et double click sur la carte
 var selectEuropa = new ol.style.Style({
@@ -266,8 +299,8 @@ var total_secondes = (date_evenement - date_actuelle) / 1000;
 // no build, reload	
 if (total_secondesreact < 300 || total_secondes < 300) {
 //	window.location.reload(false);
-datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);	
-chargerlasave(dernieresave);
+datedernieresave = affichageclanproperty("DATELASTSAVE", " ", true);	
+dernieresave = affichageclanproperty("LASTSAVE", " ", true);
 	}
 	// build
 	else {
@@ -280,11 +313,11 @@ chargerlasave(dernieresave);
                             success: function(result) {
                             resultatajax = result;							
 							//window.location.reload(false); 
-							datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);	
-							chargerlasave(dernieresave);
+							datedernieresave = affichageclanproperty("DATELASTSAVE", " ", true);
+							dernieresave = affichageclanproperty("LASTSAVE", " ", true);
                             },
                             dataType: 'text',
-                            async:false
+                            async:true
                     });
 					 $('#preloadersync').hide();
                     return resultatajax;
@@ -311,7 +344,7 @@ function chargerlalistesave()   {
      $('#choixSave')
          .append($("<option></option>")
          .attr("value",listesaveresult[save].fichier)
-         .text(listesaveresult[save].dateshow)); 	 
+         .text(listesaveresult[save].dateshow));	 
 	});
   };
   
@@ -399,6 +432,7 @@ var listenerchangelayer = varlayersource.once('change',function(e){
 });   
    }else
   {
+  vector = getLayerwarg(layers, "wargaming"); 
   varlayersource = vector.getSource().getSource();
    chargerlalog();
    Filterprovinceonmap();
@@ -3206,9 +3240,7 @@ $parseRSS({
     });
     /***************** Wow.js ******************/
     new WOW().init();
-        $(window).load(function () {
-        preloader.hide();
-    });
+ 
 	/***************** YADCF Bootstrap style .js ******************/
     function yadcfAddBootstrapClass() {
         var filterInput = $('.yadcf-filter, .yadcf-filter-range, .yadcf-filter-date'),

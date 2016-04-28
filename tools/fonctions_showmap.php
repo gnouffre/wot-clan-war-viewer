@@ -47,7 +47,7 @@ $infosrefresh = fread($fichierjson, filesize($fichierextraction));
 fclose($fichierjson);
 
         $parametretransmis = $infosrefresh;
-}  elseif ((isset($typeselection) && $typeselection == "SAVE" )) {
+}  elseif ((isset($typeselection) && $typeselection == "ALLSAVE" )) {
   
 $files = array_slice(scandir('../extract/'),2);
 $i = 0;
