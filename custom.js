@@ -252,9 +252,27 @@ var mouseInteraction = new ol.interaction.Pointer({
 
 		// click on map	
 var keyclik =   map.on('click', function(evt) {
-        var pixel = evt.pixel;
-		var provcoord = evt.coordinate;
-		displayFeature(pixel, provcoord );		
+ $("html").addClass("wait");
+ setTimeout(function() {
+
+var pixel = evt.pixel;
+var provcoord = evt.coordinate;
+displayFeature(pixel, provcoord );	
+// if is not fullscreen
+if (!document.fullscreenElement &&  !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  
+		$('#provinceInfo').modal('show');
+		$("html").removeClass("wait");		
+} else {
+// il faut passer en mode overlay pour afficher la fenetre
+ var popup = new ol.Overlay({
+        element: document.getElementById('provinceInfo')
+      });
+	  popup.setPosition(provcoord);
+      map.addOverlay(popup);
+	  $('#provinceInfo').modal('show');	
+	  $("html").removeClass("wait");
+};	
+      }, 100);	
       });
 	    
 		
@@ -2313,8 +2331,7 @@ function displayFeatureInfo(feature) {
 		$('#InfoPpovID').text('Province selected : ' +listeinfoprov['province_name']);
 		$('#Contenuprovince').html(contenuprovince);
 		$('#Contenuclan').html(contenuclan);
-		$('#Contenulink').html(Contenulink);
-		$('#provinceInfo').modal('show');		
+		$('#Contenulink').html(Contenulink);		
 		if (listeinfoprov['active_battles'] == 0 &&  listeinfoprov['attackers'] == 0 && listeinfoprov['competitors'] == 0 ) {
 		  $('#tournamentbutton').attr('disabled','disabled');
 		} else {
@@ -3123,7 +3140,7 @@ function chargerlaprov(prov) {
 	features.push(result3[0]);
 	var pixel = getCenterOf(result3[0].getGeometry());
 	displayFeatureInfo(result3[0]);
-
+	$('#provinceInfo').modal('show');
   };
 
 
