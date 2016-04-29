@@ -1,10 +1,20 @@
 <?php
-
+header('Content-Type: text/html; charset=UTF-8');
+ header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Request-With');
+    header('Access-Control-Allow-Credentials: true');
 include('settings.php');
 
-
-header('Content-Type: text/html; charset=UTF-8');
-
+$nbpassage = 0;
+spl_autoload_register(function($class)
+{
+    $file = __DIR__.'/lib/'.strtr($class, '\\', '/').'.php';
+    if (file_exists($file)) {
+        require $file;
+        return true;
+    }
+});
 
 
 /*
@@ -47,6 +57,123 @@ $infosrefresh = fread($fichierjson, filesize($fichierextraction));
 fclose($fichierjson);
 
         $parametretransmis = $infosrefresh;
+} elseif ((isset($typeselection) && $typeselection == "REFRESHCLANONSAVE" )) {
+  
+$clanid =   json_decode($clanid, true);
+// annuaire clan
+$derniereextract = "annuaireClan.json";
+$fichierclan = fopen($derniereextract, 'a+');
+$contents = fread($fichierclan, filesize($derniereextract));
+$annuaireclan = json_decode($contents, true);
+fclose($fichierclan);
+
+
+				//clan a créer ------------------------------------		
+				$numclan = 0;
+				// les clans ne sont pas trouvé dans le cas event il faut passer par la methode officielle
+				//nb passage a 10 ne passe pas sur le serveur avec 2 appel API (soit 20 appel API)
+				// 7 non plus
+				$arraylisteclanssurcarte = array_keys($clanid);
+				while ($numclan < count($clanid ) && $nbpassage < 5 ) {
+					$ind = 0;
+					$listeclanAPI = '';
+					for ($ind = 0; $ind < 10 && $numclan <= count($clanid) ; $ind++) {
+					
+					$listeclanAPI = $listeclanAPI .$clanid[$arraylisteclanssurcarte[$numclan]] .',' ; 
+					$numclan ++;
+					};
+					$nbpassage ++;
+					$pageidc3 = "https://api.worldoftanks.eu/wgn/clans/info/?application_id=" .$cluster ."&fields=description%2C%20members_count%2C%20created_at %2C%20accepts_join_requests%2C%20clan_id%2C%20color%2C%20tag%20%2C%20emblems.x32%2C%20name%2C%20is_clan_disbanded%2C%20&clan_id=" . $listeclanAPI  ;
+					$data3 = get_page($pageidc3);
+					$data3 = json_decode($data3, true);
+					$pageidc4 = "https://api.worldoftanks.eu/wot/globalmap/claninfo/?application_id=".$cluster."&clan_id=" . $listeclanAPI  ;
+					$data4 = get_page($pageidc4);
+					$data4 = json_decode($data4, true);
+					$datecreationclan = new DateTime();
+
+					
+			   $datejour = new DateTime();
+			   $madate = date_format($datejour, 'Y_m_d');
+
+			   $clanlist = array_keys($data3['data']);
+foreach ($clanlist as $clannew) {
+				if ($data3["data"][$clannew]["is_clan_disbanded"] == false) { 
+               $clanl = $data3["data"][$clannew]["clan_id"]; 
+			   $members_count = $data3["data"][$clannew]["members_count"]; 
+			   $created_at = date("Y-m-d", $data3["data"][$clannew]["created_at"]); 
+			   $accepts_join_requests = $data3["data"][$clannew]["accepts_join_requests"]; 
+			   $color = $data3["data"][$clannew]["color"]; 
+			   $tag = $data3["data"][$clannew]["tag"]; 
+			   $emblems = $data3["data"][$clannew]["emblems"]["x32"]["portal"]; 
+			   $name = $data3["data"][$clannew]["name"]; 
+			   
+			   $ratingselo_6 = $data4["data"][$clannew]["ratings"]["elo_6"]; 
+			   $ratingselo_8 = $data4["data"][$clannew]["ratings"]["elo_8"]; 
+			   $ratingselo_10 = $data4["data"][$clannew]["ratings"]["elo_10"]; 
+			   $battles = $data4["data"][$clannew]["statistics"]["battles"]; 
+			   $battles_10_level = $data4["data"][$clannew]["statistics"]["battles_10_level"]; 
+			   $battles_6_level = $data4["data"][$clannew]["statistics"]["battles_6_level"]; 
+			   $battles_8_level = $data4["data"][$clannew]["statistics"]["battles_8_level"]; 
+			   $captures = $data4["data"][$clannew]["statistics"]["captures"]; 
+			   $losses = $data4["data"][$clannew]["statistics"]["losses"]; 
+			   $provinces_count = $data4["data"][$clannew]["statistics"]["provinces_count"]; 
+			   $wins = $data4["data"][$clannew]["statistics"]["wins"]; 
+			   $wins_10_level = $data4["data"][$clannew]["statistics"]["wins_10_level"]; 
+			   $wins_6_level = $data4["data"][$clannew]["statistics"]["wins_6_level"]; 
+			   $wins_8_level = $data4["data"][$clannew]["statistics"]["wins_8_level"]; 
+			   
+			   $description = $data3["data"][$clannew]["description"]; 
+				$langage = detect_lang($description);
+				$annuaireclan[$clanl]['language'] = $langage;
+				
+				$clan_a_creer = array(
+				'id' => $clanl,
+				'tag' => $tag,
+				'color' => $color,
+				'emblem_url' => $emblems,
+				'language' => $langage,
+				'name' => $name ,
+				'elo_rating_6' => $ratingselo_6,
+				'elo_rating_8' => $ratingselo_8 ,
+				'elo_rating_10' => $ratingselo_10 ,
+				'fine_level' => 0 ,
+				'members_count' => $members_count,
+				'created_at' => $created_at,
+				'accepts_join_requests' => $accepts_join_requests,
+				'battles' => $battles,
+				'battles_10_level' => $battles_10_level,
+				'battles_6_level' => $battles_6_level ,
+				'battles_8_level' => $battles_8_level,
+				'captures' => $captures,
+				'losses' => $losses,
+				'provinces_count' => $provinces_count,
+				'wins' => $wins,
+				'wins_10_level' => $wins_10_level,
+				'wins_6_level' => $wins_6_level ,
+				'wins_8_level' => $wins_8_level,
+				'$daterefresh' => $madate 
+				
+				);
+			$annuaireclan[$clanl] = $clan_a_creer;
+				
+			   };
+			   };
+			   
+
+				};
+
+// mise a jour du fichier
+$fichierextraction = "annuaireClan.json";
+$fichierclan = fopen($fichierextraction, 'w+');
+if (flock($fichierclan, LOCK_EX)) {
+rewind($fichierclan);
+fputs($fichierclan, json_encode($annuaireclan));
+fflush($fichierclan);
+flock($fichierclan, LOCK_UN);
+};
+fclose($fichierclan);
+
+        $parametretransmis = "ok";
 }  elseif ((isset($typeselection) && $typeselection == "ALLSAVE" )) {
   
 $files = array_slice(scandir('../extract/'),2);
@@ -156,5 +283,25 @@ function get_page($url) {
     $data = curl_exec($ch);
     curl_close($ch);
     return $data;
+}
+
+function detect_lang($string) {
+$l = new TextLanguageDetect\TextLanguageDetect;
+
+    $len = $l->utf8strlen($string);
+    if ($len < 20) { // this value picked somewhat arbitrarily
+        return "";
+    }
+
+    $result = $l->detectConfidence($string);
+
+    if ($result == null) {
+        return "";
+    } else {
+        return $result['language'];
+    }
+
+
+unset($l);
 }
 ?>
