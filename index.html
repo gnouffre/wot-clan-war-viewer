@@ -461,7 +461,7 @@ Preloader map Style
 	============================================= -->
     
 
-		     <div class="preloader" id="preloaderPage" hidden>
+	 <div class="preloader" id="preloaderPage">
 	<div class='preloader-container'>
 	<i class="fa fa-circle-o-notch fa-spin fa-2x"></i><span> <font color="white">Loading...</font></span>
 </div>
@@ -569,16 +569,17 @@ Preloader map Style
 	
 		    <!-- Season / Event
 	============================================= -->
-    <section id="Season">
-        <div class="container">
-            <hr class="sep">
-			<h2 style="text-align:center;"> Season / Event </h2>
-            <div class="row wow fadeInUp" data-wow-delay=".3s">
+	<section id="Season">
+		<div class="row wow fadeInUp" data-wow-delay=".3s">
+		<hr class="sep">
+		<h2 style="text-align:center;"> Season / Event </h2>
+		<div class="col-md-2">
+		</div>
+        <div class="col-md-8">
 				<table id="tabs-season" class="table table-striped table-bordered" width="100%"></table>
-			</div>
         </div>
+		</div>
     </section>
-	
 	
 	
     <!-- Mapp
@@ -594,6 +595,7 @@ Preloader map Style
 				<div >
 					    <a id="inputFullscreen" class="btn btn-warning modal-title"><i class="fa fa-television "></i> Fullscreen Map</a>
 						<a id="reactualisation" class="btn btn-info modal-title" data-toggle="tooltip" title="The online map was synchronized every hour by server. U can resynchronize this map (limit 12 resync per hour max) or display last synchronisation data by cliking here."><i class="fa fa-refresh "></i> Resync/Reload Online Map</a>
+						<a id="clanunknow" class="btn btn-default" data-toggle="tooltip" title="Some Clan are not in Database, click here to allow server refresh for them"><i class="fa fa-refresh "></i> Resync Unknow Clan</a>
 						<span id="dernierereact"><noscript></noscript></span>
 						<span id="compte_a_rebours"><noscript></noscript></span>
 						<select id= "choixSave" name="choixSave" class="form-control"></select>			
@@ -658,29 +660,29 @@ Preloader map Style
 	    <!-- Data
 	============================================= -->
     <section id="Data">
-        <div class="container">
-            <hr class="sep">
-			<h2 style="text-align:center;"> Provinces Data </h2>
-            <div class="row wow fadeInUp" data-wow-delay=".3s">
+		<div class="row wow fadeInUp" data-wow-delay=".3s">
+		<hr class="sep">
+		<h2 style="text-align:center;"> Provinces Data </h2>
+		<div class="col-md-2">
+		</div>
+        <div class="col-md-8">
 				<table id="tabs-9tab" class="table table-striped table-bordered" width="100%"></table>
-			</div>
         </div>
+		</div>
     </section>
 	
 	    <!-- Clan
 	============================================= -->
     <section id="Clan">
-        <div class="container" data-wow-delay=".3s">
-            <hr class="sep">
-			<h2 style="text-align:center;"> Clan Data </h2>
-			
-				<div>
-					<span id="external_filter_container_100" hidden></span>
-				</div>
-
-            <div class="row wow fadeInUp " data-wow-delay=".3s">
-				<table id="tabs-clan" class="table table-striped table-bordered" width="100%"></table>
-			</div>
+		<div class="row wow fadeInUp" data-wow-delay=".3s">
+		<hr class="sep">
+		<h2 style="text-align:center;"> Clan Data </h2>
+		<div class="col-md-2">
+		<span id="external_filter_container_100" hidden></span>
+		</div>
+		<div class="col-md-8 ">
+			<table id="tabs-clan" class="table table-striped table-bordered" width="100%"></table>
+		</div>
         </div>
     </section>
 

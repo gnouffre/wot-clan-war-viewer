@@ -6,10 +6,11 @@
 	
 	// WAITING until site was ready.
 	var preloader = $('#preloader');
-	$('#preloaderPage').show();
+	//$('#preloaderPage').show();
 	
 	// GLOBAL VARIABLE
     var languages = ["afrikaans", "arabic", "basque", "belarusian", "bulgarian", "catalan", "croatian", "czech", "danish", "dutch", "english", "esperanto", "estonian", "faroese", "finnish", "french", "galician", "german", "greek", "hebrew", "hindi", "hungarian", "icelandic", "indonesian", "irish", "italian", "japanese", "khmer", "korean", "latvian", "lithuanian", "luxembourgish", "malay", "mongolian", "norwegian", "persian", "polish", "portuguese", "romanian", "russian", "serbian", "slovak", "slovene", "spanish", "swedish", "turkish", "ukrainian", "vietnamese", "wargaming"];		
+	var listclanunknow = new Array;
 	var clanTable;
 	var oTable;
 	var seasonTable;
@@ -155,6 +156,12 @@
 	affichageclanproperty("LASTSAVE", " ", true);
 	affichageclanproperty("DATELASTSAVE", " ", true);
 
+	$( document ).ajaxError(function( event, xhr, settings ) {
+	// if the HOST limit the cpu or error on page request
+	alert("my HOST refuse the REQUEST due to limit, reload plz (message from server =" +xhr.status+ ")")
+    throw new Error(xhr.responseText)
+    });
+
 	$( document ).ajaxSuccess(function( event, xhr, settings ) {
 	if ( settings.data.includes("SEASONDATA"))  {
      seasondata = JSON.parse(xhr.responseText);
@@ -282,6 +289,18 @@ $( "#inputFullscreen" ).click(function() {
 $('.ol-full-screen-false').click();
 });
 
+// button resync Clan
+$( "#clanunknow" ).click(function() {
+  setTimeout(function() {
+  $('#preloadersync').show();
+affichageclanproperty("REFRESHCLANONSAVE", JSON.stringify(listclanunknow),  false);
+affichageclanproperty("CLANLIST", " ", false);	
+$('#preloadersync').hide();
+chargerlasave($( "#choixSave" ).val());
+      }, 100);
+	  
+
+});
 // button sync/ reload to reload last save, or build a new save.
 // the choice depend of timing (no build if last has less than 5 min or next automatic save scheduled in 5 min)
 $( "#reactualisation" ).click(function() {
@@ -2404,11 +2423,11 @@ oTable.on( 'search.dt', function () {
 	$('#presult').text('Result => Province Found : ' + rows.length + ' / Clan Found : ' + rows2.length );
 	if (rows.length == $('#tabs-9tab').dataTable().fnGetData().length) {
 	$('#result_filters').removeClass('btn btn-success');
-	$('#result_filters').addClass('btn-default');
+	$('#result_filters').addClass('btn btn-default');
     $('#result_filters').text('Prov:' + rows.length + ' Clan:' + rows2.length + '(No Filter)');
 	} else 
 	{
-	$('#result_filters').removeClass('btn-default');
+	$('#result_filters').removeClass('btn btn-default');
 	$('#result_filters').addClass('btn btn-success');
 	$('#result_filters').text('Prov:' + rows.length + ' Clan:' + rows2.length + '(Filtered)' );
 	}
@@ -2967,6 +2986,7 @@ function chargerlalog() {
 // load the table province
 // when the function LOADSAVE is fired, this function was called to refresh data
 var tabevent = [];
+listclanunknow = [];
 $.each(listeinfos['provinces'], function(province) {  
 var nomclan;
 var colorclan;
@@ -3012,6 +3032,7 @@ color = 'black';
 emblem = '';
 langage = ' ';
 clantoshow = 'Unknow';
+listclanunknow.push(listeinfos['provinces'][province].owner_clan_id);
 } else {
 nomclan = listeinfos['provinces'][province].owner_clan_id;
 color = 'white';
@@ -3074,6 +3095,17 @@ tableLog.clear();
 tableLog.rows.add(tabevent);
 tableLog.columns.adjust();
 tableLog.draw();
+
+// active or desactivate resync clan button
+if (listclanunknow.length == 0) {
+	$('#clanunknow').removeClass('btn btn-success');
+	$('#clanunknow').addClass('btn btn-default');
+	$('#clanunknow').attr('disabled','disabled');
+} else {
+	$('#clanunknow').removeClass('btn btn-default');
+	$('#clanunknow').addClass('btn btn-success');
+	$('#clanunknow').removeAttr('disabled');
+};
 };		
 
 
