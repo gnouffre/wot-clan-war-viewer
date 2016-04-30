@@ -2406,7 +2406,7 @@ function getInfoBattle(idprov, provname) {
 	};
 	
 	if (listturnbattles[turnnumber]['pretenders'].length > 0) {
-	$('#titretabbattlr').html('Competitors')
+	$('#titretabbattlr').html('Competitors');
 	competitorTable = $('#tabs-battle').DataTable({
 				// bJQueryUI: true,
 				scrollY : 400,
@@ -2420,7 +2420,7 @@ function getInfoBattle(idprov, provname) {
 				autoFill : true,
 				processing : true,
 				serverSide : false,
-				bAutoWidth : true,
+				//bAutoWidth : true,
 				order : [[1, "asc"]],
 				sDom : '<r>t<fi>',
 				columns : [{
@@ -2468,7 +2468,7 @@ function getInfoBattle(idprov, provname) {
 		});
 	        if (!result3[0]) {
 			imglang = flagdir + 'europeanunion.png';
-			langagename = "not analyzed";
+			langagename = "?";
 			} else {
 			langagename = annuaireclan[listturnbattles[turnnumber]['pretenders'][clan]['id']].language;
 			var langindex = languages.indexOf(langagename);
@@ -2495,8 +2495,8 @@ function getInfoBattle(idprov, provname) {
 			});
 		});
 		competitorTable.rows.add(tabevent);
+		competitorTable.draw();	
 		competitorTable.columns.adjust();
-		competitorTable.draw();		
 	
 	} else if (listturnbattles[turnnumber]['battles'].length) {
 	
