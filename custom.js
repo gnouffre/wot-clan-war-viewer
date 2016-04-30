@@ -188,13 +188,15 @@ $(document).ajaxSuccess(function (event, xhr, settings) {
 		chargerlalistesave();
 	}
 	if (settings.data.includes("LASTSAVE")) {
-		dernieresave = $.extend({}, xhr.responseText);
+		dernieresavestr = $.extend( true, {}, xhr);
+		dernieresave = dernieresavestr.responseText;
 		// On page load, we use the most recent save.
 		// does not work, push to ajax stop with condition...
 
 	}
 	if (settings.data.includes("DATELASTSAVE")) {
-		datedernieresave = $.extend({}, xhr.responseText);
+		datedernieresavestr = $.extend( true, {}, xhr);
+		datedernieresave = datedernieresavestr.responseText;
 	}
 
 });
