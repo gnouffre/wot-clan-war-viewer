@@ -2316,12 +2316,12 @@ function displayFeatureInfo(idprov) {
 			imglang = flagdir + listeinfoclan.language + '.png';
 			langage = '<img src="' + imglang + '" style="width: 20px; height: 20px" />' + listeinfoclan.language;
 		};
-		var contenuclan = '<div style="display: inline-block;"><div style="float: left; margin: 20px;">' +
+		var contenuclan = '<div style="display: inline-block;"><div style="float: left; padding: 20px;">' +
 			'<p> Tag      : ' + listeinfoclan.tag + ' </p>' +
 			'<p> Name      : ' + listeinfoclan.name + ' </p>' +
 			'<p> Color  : <b style="background-color: ' + listeinfoclan.color + '"> ' + listeinfoclan.color + '</b> </p>' +
 			'<p> Emblem   : <img src="' + listeinfoclan.emblem_url + '" /> </p>' +
-			'</div><div style="float: left; margin: 20px;">' +
+			'</div><div style="float: left; padding: 20px;">' +
 			'<p> Language    : ' + langage + ' </p>' +
 			'<p> Members : ' + listeinfoclan.members_count + ' </p>' +
 			'<p><input type="button" onclick="Detailinfoclan(' + listeinfos['provinces'][idprov].owner_clan_id + ')" value="More Detail ' + listeinfoclan.tag + '"  class="btn btn-primary"  > </p>' +
@@ -2331,7 +2331,7 @@ function displayFeatureInfo(idprov) {
 	};
 	Contenulink = '<p> Goto ' + listeinfoprov['province_name'] + ' : <a href="https://eu.wargaming.net/globalmap/?utm_campaign=wot-portal&utm_medium=link&utm_source=main-menu' + linkprov + '">Link</a><p>' + lesliens +
 		'<p> Clan portal of ' + listeinfoclan.tag + ' : <a href="http://eu.wargaming.net/clans/' + listeinfos['provinces'][idprov].owner_clan_id + '/">Link</a><p>';
-	var contenuprovince = '<div style="display: inline-block;"><div style="float: left; margin: 20px;">' +
+	var contenuprovince = '<div style="display: inline-block;"><div style="float: left; padding: 20px;">' +
 		'<p> Province : ' + listeinfoprov['province_name'] + ' </p>' +
 		'<p> Front    : ' + listeinfoprov['front_name'] + ' </p>' +
 		'<p> Arena    : ' + listeinfoprov['arena_name'] + ' </p>' +
@@ -2369,7 +2369,7 @@ function getInfoBattle(idprov, provname) {
 	console.log(listturnbattles);
 	$('#InfoBattlesID').html('Battle on : ' + provname + '<input id="clikprovClan" onclick="clikprovClan(\''+idprov+'\')" type="button" data-toggle="tooltip" title="Return prov detail" value="' +idprov+ '" class="btn btn-primary">');
 	var turnnumber = Object.keys(listturnbattles).length;
-	contenuBattleHtml = "<div class='col-sm-4' style='margin: 20px;'>" +
+	contenuBattleHtml = "<div class='col-sm-4 form-search' style='padding: 20px;'>" +
 					"<h5>Turn " + listturnbattles[turnnumber]['round_number'] +" </h5>" +
 					'<p> Owner : <img src="' + listturnbattles[turnnumber]['owner'].emblem_url + '" /> ' + listturnbattles[turnnumber]['owner']['tag'] + ' </p>' +
 					'<p><input type="button" onclick="Detailinfoclan(' + listeinfos['provinces'][idprov].owner_clan_id + ')" value="More Detail ' + listturnbattles[turnnumber]['owner']['tag'] + '"  class="btn btn-primary"  > </p>' +
@@ -2386,7 +2386,11 @@ function getInfoBattle(idprov, provname) {
 					'<p> Next round Start : ' + listturnbattles[turnnumber]['next_round_start_time'] + ' </p>' +
 					'<a id="prevbattle" class="btn btn-info" data-toggle="tooltip" title="Previous round"><i class="fa fa-arrow-circle-left"></i></a>' +
 					'<a id="nextbattle" class="btn btn-info" data-toggle="tooltip" title="Previous round"><i class="fa fa-arrow-circle-right"></i></a>' +
-				    "</div>";
+				    "</div>"+
+					 "<div class='col-sm-8 form-search' style='padding: 20px;'>" +
+					 "<h5 id='titretabbattlr'></h5>" +
+					'<table id="tabs-battle" class="table table-striped table-bordered" width="100%"></table>'+
+					"</div>"; 
 	$('#BattleInfoContainer').html(contenuBattleHtml);
 		if (listturnbattles[turnnumber]['round_number'] > 1) {
 		$('#prevbattle').removeAttr("disabled");
@@ -2401,7 +2405,102 @@ function getInfoBattle(idprov, provname) {
 		$('#nextbattle').attr('disabled', 'disabled');
 	};
 	
+	if (listturnbattles[turnnumber]['pretenders'].length > 0) {
+	$('#titretabbattlr').html('Competitors')
+	competitorTable = $('#tabs-battle').DataTable({
+				// bJQueryUI: true,
+				scrollY : 400,
+				scrollX : true,
+				//scroller:       true,
+				paging : false,
+				scrollCollapse : true,
+				colReorder : true,
+				deferRender : false,
+				paginate : true,
+				autoFill : true,
+				processing : true,
+				serverSide : false,
+				bAutoWidth : true,
+				order : [[1, "asc"]],
+				sDom : '<r>t<fi>',
+				columns : [{
+						title : "Id",
+						data : "id",
+						visible : false,
+					}, {
+						title : "Clan",
+						data : "clan"
+					}, {
+						title : "Color",
+						data : "color"
+					}, {
+						title : "Language",
+						data : "language"
+					}, {
+						title : "Name",
+						data : "name"
+					}, {
+						title : "elo_rating_6",
+						data : "elo_rating_6"
+					}, {
+						title : "elo_rating_8",
+						data : "elo_rating_8"
+					}, {
+						title : "elo_rating_10",
+						data : "elo_rating_10"
+					}, {
+						title : "arena_battles_count",
+						data : "arena_battles_count"
+					}, {
+						title : "arena_wins_percent",
+						data : "arena_wins_percent"
+					},{
+						title : "fine_level",
+						data : "fine_level"
+					}
+				]
+			});
+			
+			var tabevent = [];
+		$.each(listturnbattles[turnnumber]['pretenders'], function (clan) {
+		    var result3 = $.grep(Object.keys(annuaireclan), function (e) {
+			return e == listturnbattles[turnnumber]['pretenders'][clan]['id']
+		});
+	        if (!result3[0]) {
+			imglang = flagdir + 'europeanunion.png';
+			langagename = "not analyzed";
+			} else {
+			langagename = annuaireclan[listturnbattles[turnnumber]['pretenders'][clan]['id']].language;
+			var langindex = languages.indexOf(langagename);
+			if (langindex == -1) {
+				imglang = flagdir + 'europeanunion.png'
+			} else {
+				imglang = flagdir + langagename + '.png'
+			}
+			};
+
+			tabevent.push({
+				'id' : listturnbattles[turnnumber]['pretenders'][clan].id,
+				'clan' : '<img src="' + listturnbattles[turnnumber]['pretenders'][clan].emblem_url + '" style="width: 20px; height: 20px" />' + listturnbattles[turnnumber]['pretenders'][clan].tag,
+				'color' : '<button type="button" style="background-color:' + listturnbattles[turnnumber]['pretenders'][clan].color + '" disabled>' + listturnbattles[turnnumber]['pretenders'][clan].color + '</button>',
+				'language' : '<img src="' + imglang + '" style="width: 20px; height: 20px" />' + langagename,
+				'name' : listturnbattles[turnnumber]['pretenders'][clan].name,
+				'elo_rating_6' : listturnbattles[turnnumber]['pretenders'][clan].elo_rating_6,
+				'elo_rating_8' : listturnbattles[turnnumber]['pretenders'][clan].elo_rating_8,
+				'elo_rating_10' : listturnbattles[turnnumber]['pretenders'][clan].elo_rating_10,
+				
+				'arena_battles_count' : listturnbattles[turnnumber]['pretenders'][clan].arena_battles_count,
+				'arena_wins_percent' : listturnbattles[turnnumber]['pretenders'][clan].arena_wins_percent,
+				'fine_level' : listturnbattles[turnnumber]['pretenders'][clan].fine_level
+			});
+		});
+		competitorTable.rows.add(tabevent);
+		competitorTable.columns.adjust();
+		competitorTable.draw();		
 	
+	} else if (listturnbattles[turnnumber]['battles'].length) {
+	
+	}
 	
 	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {				
 				$('#provinceInfo').modal('hide');
