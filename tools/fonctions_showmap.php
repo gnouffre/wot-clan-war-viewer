@@ -36,6 +36,7 @@ if (isset($_POST['clanid'])) {
 }
 
 
+
 // Traitements
 
 if ((isset($typeselection) && $typeselection == "CLANLIST" )) {
@@ -198,7 +199,7 @@ $i++;
  
 
         $parametretransmis = json_encode($infos);
-}  elseif (isset($typeselection) && $typeselection == "LASTSAVE" ) {
+}  elseif (isset($typeselection) && $typeselection == "NAMELASTSAVE" ) {
   
 $fichierextraction = "extraction.json";
 $parametretransmis = $fichierextraction;
@@ -243,6 +244,23 @@ flock($fichierjson, LOCK_UN);
 fclose($fichierjson);
 $parametretransmis = json_encode($listeseason);
 
+} elseif (isset($typeselection) && $typeselection == "BATTLETURNINFO" && isset($clanid)) {
+$listturn = [];
+$pagenumber = 0;
+$provinceid = $clanid;
+$pageidc = "https://eu.wargaming.net/globalmap/game_api/tournament_info?alias=".$provinceid."&round=". $pagenumber;
+$data = get_page($pageidc);
+$data = json_decode($data, true);
+$listturn[$data['round_number']] = $data;
+while (isset($data['next_round'])) {
+$pagenumber = $data['next_round'];
+$pageidc = "https://eu.wargaming.net/globalmap/game_api/tournament_info?alias=".$provinceid."&round=". $pagenumber;
+$data = get_page($pageidc);
+$data = json_decode($data, true);
+$listturn[$data['round_number']] = $data;
+}
+
+$parametretransmis = json_encode($listturn);
 } else {
     $parametretransmis = "error" . $typeselection . $clanid;
 }

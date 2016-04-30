@@ -154,13 +154,13 @@ var map = new ol.Map({
 var seasondata;
 var annuaireclan;
 var listesaveresult;
-var listesaveresult;
+var listturnbattles;
 var dernieresave;
 var datedernieresave;
 affichageclanproperty("SEASONDATA", " ", true);
 affichageclanproperty("CLANLIST", " ", true);
 affichageclanproperty("ALLSAVE", " ", true);
-affichageclanproperty("LASTSAVE", " ", true);
+affichageclanproperty("NAMELASTSAVE", " ", true);
 affichageclanproperty("DATELASTSAVE", " ", true);
 
 $(document).ajaxError(function (event, xhr, settings) {
@@ -187,7 +187,7 @@ $(document).ajaxSuccess(function (event, xhr, settings) {
 		//ordered desc by php
 		chargerlalistesave();
 	}
-	if (settings.data.includes("LASTSAVE")) {
+	if (settings.data.includes("NAMELASTSAVE")) {
 		dernieresavestr = $.extend( true, {}, xhr);
 		dernieresave = dernieresavestr.responseText;
 		// On page load, we use the most recent save.
@@ -198,10 +198,12 @@ $(document).ajaxSuccess(function (event, xhr, settings) {
 		datedernieresavestr = $.extend( true, {}, xhr);
 		datedernieresave = datedernieresavestr.responseText;
 	}
-
+	if (settings.data.includes("BATTLETURNINFO")) {
+		listturnbattles = JSON.parse(xhr.responseText);;
+	}
 });
 
-// when all AJAX are stopped.
+// when all AJAX are stopped or started.
 $(document).ajaxStop(function () {
 	// Creating datatable, they are charged after the loading data from php
 	// season and clan are loaded at start only, province is loaded when a save is loaded only.
@@ -209,6 +211,10 @@ $(document).ajaxStop(function () {
 	// due to ajax async, i can try to put lastsave while select save was empty, so the select is void on first load of page
 	$('#preloaderPage').hide();
 });
+
+/* $(document).ajaxStart(function () {
+	$('#preloaderPage').show();
+}) */;
 
 // ----------------------EVENT ------------------------>>
 // change save selection
@@ -281,6 +287,11 @@ var keyclik = map.on('click', function (evt) {
 			};
 		}, 100);
 	});
+	
+	
+
+	
+
 
 map.getView().on('propertychange', function (e) {
 	// when the view of map change , for exemple change of zoom level
@@ -338,7 +349,7 @@ $("#reactualisation").click(function () {
 	if (total_secondesreact < 300 || total_secondes < 300) {
 		//	window.location.reload(false);
 		datedernieresave = affichageclanproperty("DATELASTSAVE", " ", true);
-		dernieresave = affichageclanproperty("LASTSAVE", " ", true);
+		dernieresave = affichageclanproperty("NAMELASTSAVE", " ", true);
 	}
 	// build
 	else {
@@ -354,7 +365,7 @@ $("#reactualisation").click(function () {
 					$('#preloadersync').hide();
 					//window.location.reload(false);
 					datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);
-					dernieresave = affichageclanproperty("LASTSAVE", " ", false);
+					dernieresave = affichageclanproperty("NAMELASTSAVE", " ", false);
 					$("#choixSave").val(dernieresave).change();
 				},
 				dataType : 'text',
@@ -1661,7 +1672,7 @@ function affichageclanbattles() {
 		var result3 = $.grep(features, function (e) {
 				return e.getProperties().province_id == datarowprovid
 			});
-		var newstyle = color2[intensity][0].toString() + color2[intensity][1].toString() + color2[intensity][2].toString() + color1[0].toString() + color1[1].toString() + color1[2].toString();
+		var newstyle = color2[intensity][0].toString() + color2[intensity][1].toString() + color2[intensity][2].toString() + nbtotal.toString();
 		if (!stylecache[newstyle] && nbtotal > 0) {
 			stylecache[newstyle] = new ol.style.Style({
 					fill : new ol.style.Fill({
@@ -2276,18 +2287,18 @@ function displayFeature(pixel, coord) {
 	map.forEachFeatureAtPixel(pixel, function (feature, layer) {
 
 		if (layer == vector) {
-			displayFeatureInfo(feature);
+			var idprov = feature.get('province_id');
+			displayFeatureInfo(idprov);
 		};
 	});
 };
 
-function displayFeatureInfo(feature) {
+function displayFeatureInfo(idprov) {
 	// display info on province
 	// called when a province was click on map or on Datatable
 	var Contenulink;
 	var lesliens;
-	var linkprov = feature.get('linkurl');
-	var idprov = feature.get('province_id');
+	var linkprov = listeinfos['provinces'][idprov].uri;
 	var listeinfoprov = listeinfos['provinces'][idprov];
 	if (listeinfoprov['owner_clan_id'] === null) {
 		var contenuclan = '<p> Civilian, no properties </p>';
@@ -2332,6 +2343,7 @@ function displayFeatureInfo(feature) {
 		'<p> Battles  : ' + listeinfoprov['active_battles'] + ' </p>' +
 		'<p> Attackers   : ' + listeinfoprov['attackers'] + ' </p>' +
 		'<p> Competitors   : ' + listeinfoprov['competitors'] + ' </p>' +
+		'<p><input id="BattleButton" type="button" onclick="getInfoBattle(\'' + idprov + '\', \'' + listeinfoprov["province_name"] + '\')" value="Look Battle"  class="btn btn-info"  > </p>' +
 		'<p> Tournament <a id="tournamentbutton" href="https://eu.wargaming.net/globalmap/#tournament/' + listeinfoprov['province_id'] + '">Link</a></p>' +
 		'</div></div>';
 	$('#InfoPpovID').text('Province selected : ' + listeinfoprov['province_name']);
@@ -2340,10 +2352,101 @@ function displayFeatureInfo(feature) {
 	$('#Contenulink').html(Contenulink);
 	if (listeinfoprov['active_battles'] == 0 && listeinfoprov['attackers'] == 0 && listeinfoprov['competitors'] == 0) {
 		$('#tournamentbutton').attr('disabled', 'disabled');
+		$('#BattleButton').attr('disabled', 'disabled');
 	} else {
 		$('#tournamentbutton').removeAttr("disabled");
+		$('#BattleButton').removeAttr("disabled");
 	};
 };
+
+function getInfoBattle(idprov, provname) {
+	// call php function to get JSon of all turn battles, if battle dont start we have only one battle in json with competitors
+	// else we got all turn with list of attackers.
+	var contenuBattle;
+	$("html").addClass("wait");
+	setTimeout(function () {
+	affichageclanproperty("BATTLETURNINFO", idprov, false);
+	console.log(listturnbattles);
+	$('#InfoBattlesID').html('Battle on : ' + provname + '<input id="clikprovClan" onclick="clikprovClan(\''+idprov+'\')" type="button" data-toggle="tooltip" title="Return prov detail" value="' +idprov+ '" class="btn btn-primary">');
+	var turnnumber = Object.keys(listturnbattles).length;
+	contenuBattleHtml = "<div class='col-sm-4' style='margin: 20px;'>" +
+					"<h5>Turn " + listturnbattles[turnnumber]['round_number'] +" </h5>" +
+					'<p> Owner : <img src="' + listturnbattles[turnnumber]['owner'].emblem_url + '" /> ' + listturnbattles[turnnumber]['owner']['tag'] + ' </p>' +
+					'<p><input type="button" onclick="Detailinfoclan(' + listeinfos['provinces'][idprov].owner_clan_id + ')" value="More Detail ' + listturnbattles[turnnumber]['owner']['tag'] + '"  class="btn btn-primary"  > </p>' +
+					'<p> round number : ' + listturnbattles[turnnumber]['round_number'] + ' </p>' +
+					'<p> start time : ' + listturnbattles[turnnumber]['start_time'] + ' </p>' +
+					'<p> SuperFinal : ' + listturnbattles[turnnumber]['is_superfinal'] + ' </p>' +
+					'<p> Number battles : ' + listturnbattles[turnnumber]['battles'].length + ' </p>' +
+					'<p> Number Attackers : ' + ((listturnbattles[turnnumber]['battles'].length) * 2) + ' </p>' +
+					'<p> Number pretenders : ' + listturnbattles[turnnumber]['pretenders'].length + ' </p>' +
+					'<p> Max Attackers : ' + listturnbattles[turnnumber]['size'] + ' </p>' +
+					'<p> Arena : ' + listturnbattles[turnnumber]['arena_name'] + ' </p>' +
+					'<p> province revenue : ' + listturnbattles[turnnumber]['province_revenue'] + ' </p>' +
+					'<p> revenue level : ' + listturnbattles[turnnumber]['revenue_level'] + ' </p>' +
+					'<p> Next round Start : ' + listturnbattles[turnnumber]['next_round_start_time'] + ' </p>' +
+					'<a id="prevbattle" class="btn btn-info" data-toggle="tooltip" title="Previous round"><i class="fa fa-arrow-circle-left"></i></a>' +
+					'<a id="nextbattle" class="btn btn-info" data-toggle="tooltip" title="Previous round"><i class="fa fa-arrow-circle-right"></i></a>' +
+				    "</div>";
+	$('#BattleInfoContainer').html(contenuBattleHtml);
+		if (listturnbattles[turnnumber]['round_number'] > 1) {
+		$('#prevbattle').removeAttr("disabled");
+		
+	} else {
+		$('#prevbattle').attr('disabled', 'disabled');
+	};
+	if (listturnbattles[turnnumber]['next_round'] !== null) {
+		$('#nextbattle').removeAttr("disabled");
+		
+	} else {
+		$('#nextbattle').attr('disabled', 'disabled');
+	};
+	
+	
+	
+	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {				
+				$('#provinceInfo').modal('hide');
+				$('#BattleInfo').modal('show');
+				$("html").removeClass("wait");
+			} else {
+				// il faut passer en mode overlay pour afficher la fenetre
+				var popup = new ol.Overlay({
+						element : document.getElementById('BattleInfo')
+					});
+				popup.setPosition(map.getView().getCenter());
+				map.addOverlay(popup);		
+				$('#provinceInfo').modal('hide');
+				$('#BattleInfo').modal('show');
+				$("html").removeClass("wait");
+			};
+					}, 100);
+	
+};
+
+	// click on detail prov
+	function clikprovClan(idprov) {
+		$("html").addClass("wait");
+		setTimeout(function () {
+
+			displayFeatureInfo(idprov);
+			// if is not fullscreen
+			if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+				$('#BattleInfo').modal('hide');
+				$('#provinceInfo').modal('show');
+				$("html").removeClass("wait");
+			} else {
+				// il faut passer en mode overlay pour afficher la fenetre
+				var popup = new ol.Overlay({
+						element : document.getElementById('provinceInfo')
+					});
+				popup.setPosition(map.getView().getCenter());
+				map.addOverlay(popup);
+				$('#BattleInfo').modal('hide');
+				$('#provinceInfo').modal('show');
+				$("html").removeClass("wait");
+				
+			};
+		}, 100);
+	};
 
 function getScaleZoom() {
 	// function to rewrite, we need to keep icon stable
