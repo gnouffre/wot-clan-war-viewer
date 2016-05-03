@@ -15,7 +15,7 @@ var clanTable;
 var oTable;
 var seasonTable;
 var maptobuildprogress = 0;
-var flagdir = "http://wotclanwar2.16mb.com/tools/flags/"
+var flagdir = "tools/flags/"
 	var date_evenement = new Date();
 var date_actuelle = new Date();
 var cartecomplete;
