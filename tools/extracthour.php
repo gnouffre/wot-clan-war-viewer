@@ -1,5 +1,4 @@
-
-     
+#! php     
 <?php
 
 include('settings.php');
@@ -7,7 +6,7 @@ $nbpassage = 0;
 header('Content-type: text/html; charset=utf-8', true);
 spl_autoload_register(function($class)
 {
-    $file = __DIR__.'/lib/'.strtr($class, '\\', '/').'.php';
+    $file = __DIR__.'/langage/'.strtr($class, '\\', '/').'.php';
     if (file_exists($file)) {
         require $file;
         return true;
@@ -23,7 +22,7 @@ spl_autoload_register(function($class)
 
 $heureducron = date("G");
 $minuteducron = date("i");
-echo 'heure du cron' .$heureducron;
+echo 'heure du cron' .$heureducron .'\n';
 if ($heureducron == 3 )
 {
 
@@ -31,7 +30,7 @@ $date = new DateTime();
 
 date_sub($date, date_interval_create_from_date_string('1 days'));
 $madate = date_format($date, 'Y_m_d');
- echo $madate;
+ echo $madate .'\n';
 // lecture du dernier fichier
 $fichierextraction = "../extract/extraction.json";
 $fichierjson = fopen($fichierextraction, 'a+');
@@ -83,9 +82,10 @@ function get_info2($cluster) {
 
 $season_id = 'europemap';	
 $pageidc = "https://api.worldoftanks.eu/wot/globalmap/seasons/?application_id=" . $cluster . '&status=ACTIVE';
-$data = get_page($pageidc);
+//$data = get_page($pageidc);
+$data = file_get_contents($pageidc);
 $data = json_decode($data, true);
-echo 'season_id' .$data['data'][0]['season_id'];
+echo 'season_id' .$data['data'][0]['season_id'] .'\n';
 if ($data['status'] == 'ok' && $data['data'][0]['status'] == 'ACTIVE' ) {
 $season_id = $data['data'][0]['season_id'];
 }
@@ -104,9 +104,13 @@ fclose($fichierclan);
 
 			// deuxieme partie : liste front 	
 	$pageidc3 = "https://api.worldoftanks.eu/wot/globalmap/fronts/?application_id=" . $cluster;
-$data3 = get_page($pageidc3);
+//$data3 = get_page($pageidc3);
+$data3 = file_get_contents($pageidc3);
+echo ' liste front' .'\n';
 $data3 = json_decode($data3, true);
 $frontlist = array_keys($data3['data']);
+
+
 
 $listeclanssurcarte = [];
 $listeclanssurcartep2 = [];
@@ -114,7 +118,7 @@ $listeclanssurcartep2 = [];
 foreach ($frontlist as $front) {		
 $frontid =  $data3['data'][$front]['front_id']	;		
 		// troisieme partie : liste provinces
-echo 'NEW FRONTLIST --------->'.$data3['data'][$front]['front_id'];	
+echo 'NEW FRONTLIST --------->'.$data3['data'][$front]['front_id'] .'\n';	
 $k = 0;
 
 $j= 0;
@@ -123,17 +127,18 @@ $data2['meta']['count'] = 100;
 while ($data2['status'] == 'ok' and $data2['meta']['count'] > 0) {
 $j++;
 $pageidc2 = "https://api.worldoftanks.eu/wot/globalmap/provinces/?application_id=" . $cluster . "&language=en&front_id=" .$frontid . "&page_no=" . $j ;
-$data2page = get_page($pageidc2);
+//$data2page = get_page($pageidc2);
+$data2page = file_get_contents($pageidc2);
 $data2 = json_decode($data2page, true);
-echo $data2['status'];
+echo 'recherche province passage numero : ' . $j .'\n';
 if ($data2['status'] == 'error') {
 echo $data2page;
 }
-echo '</br>NEW LOT PROVINCE --------->'."&page_no=" . $j .'</br>';
+
 $provincelist = array_keys($data2['data']);
-
+$nbprov = 0;
 foreach ($provincelist as $province) {
-
+$nbprov ++;
 $provinceencours = $data2['data'][$province]['province_id'];
                $parametresprovince[$provinceencours]['arena_name'] = $data2['data'][$province]['arena_name'];
 			   $parametresprovince[$provinceencours]['province_name'] = $data2['data'][$province]['province_name'];
@@ -171,7 +176,7 @@ $provinceencours = $data2['data'][$province]['province_id'];
                 $k++;
 				}
 				}
-		
+				echo 'nombre province traité : ' . $nbprov .'\n';
 				
 				}
 				$parametresfront[$data3['data'][$front]['front_id']] = $data3['data'][$front];
@@ -181,7 +186,7 @@ $provinceencours = $data2['data'][$province]['province_id'];
 				'provinces' => $parametresprovince,
 				'clan' => $parametresclan,
 				'season_id' => $season_id);
-				
+				echo 'ecriture du json : ' .'\n';
 				
 				
 				//clan a créer ------------------------------------		
@@ -200,10 +205,12 @@ $provinceencours = $data2['data'][$province]['province_id'];
 					};
 					$nbpassage ++;
 					$pageidc3 = "https://api.worldoftanks.eu/wgn/clans/info/?application_id=" .$cluster ."&fields=description%2C%20members_count%2C%20created_at %2C%20accepts_join_requests%2C%20clan_id%2C%20color%2C%20tag%20%2C%20emblems.x32%2C%20name%2C%20&clan_id=" . $listeclanAPI  ;
-					$data3 = get_page($pageidc3);
+					//$data3 = get_page($pageidc3);
+					$data3 = file_get_contents($pageidc3);
 					$data3 = json_decode($data3, true);
 					$pageidc4 = "https://api.worldoftanks.eu/wot/globalmap/claninfo/?application_id=".$cluster."&clan_id=" . $listeclanAPI  ;
-					$data4 = get_page($pageidc4);
+					//$data4 = get_page($pageidc4);
+					$data4 = file_get_contents($pageidc4);
 					$data4 = json_decode($data4, true);
 					$datecreationclan = new DateTime();
 
@@ -294,14 +301,15 @@ foreach ($clanlist as $clannew) {
 					};
 					$nbpassage ++;
 					$pageidc3 = "https://api.worldoftanks.eu/wgn/clans/info/?application_id=" .$cluster ."&fields=description%2C%20members_count%2C%20created_at %2C%20accepts_join_requests%2C%20clan_id%2C%20color%2C%20tag%20%2C%20emblems.x32%2C%20name%2C%20&clan_id=" . $listeclanAPI  ;
-					$data3 = get_page($pageidc3);
-						
+					//$data3 = get_page($pageidc3);
+					$data3 = file_get_contents($pageidc3);	
 					$data3 = json_decode($data3, true);
 					$pageidc4 = "https://api.worldoftanks.eu/wot/globalmap/claninfo/?application_id=".$cluster."&clan_id=" . $listeclanAPI  ;
-					$data4 = get_page($pageidc4);
-							
+					//$data4 = get_page($pageidc4);
+					$data4 = file_get_contents($pageidc4);		
 					$data4 = json_decode($data4, true);
 					$datecreationclan = new DateTime();
+
 
 					
 			   $datejour = new DateTime();
@@ -419,13 +427,12 @@ $l = new TextLanguageDetect\TextLanguageDetect;
     }
 
     $result = $l->detectConfidence($string);
-
+	echo "langage recherché " . $result['language'] .'\n';
     if ($result == null) {
         return "";
     } else {
         return $result['language'];
     }
-
 
 unset($l);
 }
@@ -446,9 +453,11 @@ function get_coordonate($province_id) {
 
 
 $pageidp = "https://cwxstatic-eu.wargaming.net/v25/provinces_geojson/" . $province_id . ".json";
-    $data4 = get_page($pageidp);
-    $data4dat = json_decode($data4, true);	
+    //$data4 = get_page($pageidp);
+    $data4 = file_get_contents($pageidp);		
+	$data4dat = json_decode($data4, true);	
 	$geom = $data4dat['geom'];
+
 return $geom ;
 
 
