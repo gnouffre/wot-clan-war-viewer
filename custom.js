@@ -191,8 +191,65 @@ var dernieresave = 'extraction.json';
 			var saveColl = db_data.getCollection('ALLSAVE');
 			};
 	chargerlalistesave();
-	chargerlasave('extraction.json');
+	//chargerlasave('extraction.json');
 	});	
+	
+	var urlwebapp = "https://script.google.com/macros/s/AKfycbxJmYTHBXM-_urMpk94iXv06jgCOjhGi7mljc39GYfhIZzq9Yo/exec?typeSelection=LOADSAVE&save="+ "extraction.json";
+	$.getJSON(urlwebapp, function(data) { 
+		var listeinfosColl = db_save.addCollection("extraction.json");
+		listeinfosColl.insert(data);
+		listeinfos = listeinfosColl.chain( ).data()[0];
+		layers = map.getLayers().getArray();
+		vector = getLayerwarg(layers, "wargaming");
+		chargedgeojson = listeinfos['season_id'];
+		map.removeLayer(vector);
+		var masource = new ol.source.Vector({
+			format: new ol.format.GeoJSON()
+			});	
+			var urlwebapp = "https://script.google.com/macros/s/AKfycbxJmYTHBXM-_urMpk94iXv06jgCOjhGi7mljc39GYfhIZzq9Yo/exec?typeSelection=MAP&seasonid=" + chargedgeojson;
+			$.getJSON(urlwebapp, function(data) { 
+			var listemapColl = db_map.addCollection(chargedgeojson);
+			listemapColl.insert(data);
+			var mamap = listemapColl.chain( ).data()[0];
+			datastring =  JSON.stringify(mamap);
+			var geojsonFormat = new ol.format.GeoJSON();
+			var features = geojsonFormat.readFeatures(datastring,
+			{featureProjection: 'EPSG:3857'});
+			masource.addFeatures(features);
+							cartecomplete = new ol.layer.Vector({
+						idbase : "wargaming",
+						source : masource
+						
+					});
+				map.addLayer(cartecomplete);
+				layers = map.getLayers().getArray();
+				vector = getLayerwarg(layers, "wargaming");
+				varlayersource = vector.getSource();
+
+				var listenerchangelayer = varlayersource.once('change', function (e) {
+						if (varlayersource.getState() === 'ready') {
+							// carte chargée
+							map.unByKey(listenerchangelayer);
+							chargerlalog();
+							Filterprovinceonmap();
+							var modAff = $('#ModeAffichage').val();
+							ModeAffichage(modAff);
+
+							try {
+								vector2 = getLayerwarg(layers, "TileWMS");
+								extentWARN = varlayersource.getExtent();
+								center2Layers = ol.extent.getCenter(extentWARN);
+								//alert(center2Layers);
+							} catch (e) {
+								alert(e.message);
+							}
+							map.getView().setCenter(center2Layers);
+						};
+					});
+					
+			varlayersource.changed();
+			}) 
+		}) 
 // affichageclanproperty("NAMELASTSAVE", " ", true);
 // affichageclanproperty("DATELASTSAVE", " ", true);
 
@@ -494,26 +551,7 @@ function chargerlasave3(masource) {
 				vector = getLayerwarg(layers, "wargaming");
 				varlayersource = vector.getSource();
 
-				var listenerchangelayer = varlayersource.once('change', function (e) {
-						if (varlayersource.getState() === 'ready') {
-							// carte chargée
-							map.unByKey(listenerchangelayer);
-							chargerlalog();
-							Filterprovinceonmap();
-							var modAff = $('#ModeAffichage').val();
-							ModeAffichage(modAff);
 
-							try {
-								vector2 = getLayerwarg(layers, "TileWMS");
-								extentWARN = varlayersource.getExtent();
-								center2Layers = ol.extent.getCenter(extentWARN);
-								//alert(center2Layers);
-							} catch (e) {
-								alert(e.message);
-							}
-							map.getView().setCenter(center2Layers);
-						};
-					});
 			varlayersource.changed();
 }
 
