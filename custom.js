@@ -10,23 +10,13 @@ var preloader = $('#preloader');
 
 // GLOBAL VARIABLE
 var languages = ["afrikaans", "arabic", "basque", "belarusian", "bulgarian", "catalan", "croatian", "czech", "danish", "dutch", "english", "esperanto", "estonian", "faroese", "finnish", "french", "galician", "german", "greek", "hebrew", "hindi", "hungarian", "icelandic", "indonesian", "irish", "italian", "japanese", "khmer", "korean", "latvian", "lithuanian", "luxembourgish", "malay", "mongolian", "norwegian", "persian", "polish", "portuguese", "romanian", "russian", "serbian", "slovak", "slovene", "spanish", "swedish", "turkish", "ukrainian", "vietnamese", "wargaming"];
-var listclanunknow = new Array;
+//var listclanunknow = new Array;
 var clanTable;
 var oTable;
 var seasonTable;
 var maptobuildprogress = 0;
 var flagdir = "tools/flags/"
-	var date_evenement = new Date();
-var date_actuelle = new Date();
 var cartecomplete;
-date_evenement.setHours(date_evenement.getHours() + 1);
-date_evenement.setMinutes(05);
-date = new Date(datedernieresave * 1000);
-var hours = date.getHours();
-var minutes = date.getMinutes();
-var year = date.getFullYear();
-var month = date.getMonth() + 1;
-var date = date.getDate();
 var clanselected = "";
 var fullscreen = false;
 var layers;
@@ -74,7 +64,7 @@ app.google = function () {
 				// on ne fait rien
 			}
 			if (layer.get('idbase') == 'wargaming' || layer.get('idbase') == 'batailles' || layer.get('idbase') == 'texte') {
-				var varlayersource = layer.getSource().getSource();
+				var varlayersource = layer.getSource();
 				features = $.merge(features, varlayersource.getFeatures());
 			}
 			if (layer.get('idbase') == 'icone' || layer.get('idbase') == 'texte2' || layer.get('idbase') == 'texte3') {
@@ -150,26 +140,69 @@ var map = new ol.Map({
 		})
 	});
 
-// LOADING Data from PHP
+// LOADING Data 
 var seasondata;
 var annuaireclan;
 var listesaveresult;
 var listturnbattles;
-var dernieresave;
-var datedernieresave;
-affichageclanproperty("SEASONDATA", " ", true);
-affichageclanproperty("CLANLIST", " ", true);
-affichageclanproperty("ALLSAVE", " ", true);
-affichageclanproperty("NAMELASTSAVE", " ", true);
-affichageclanproperty("DATELASTSAVE", " ", true);
+var dernieresave = 'extraction.json';
+// prepare database from Loki 
+ db_data = new loki('data.json', { env: 'BROWSER'})
+	
+ db_map = new loki('map.json', { env: 'BROWSER'});
+ db_save = new loki('save.json', { env: 'BROWSER'});
+// var datedernieresave;
+// affichageclanproperty("SEASONDATA", " ", true);
+// affichageclanproperty("CLANLIST", " ", true);
+// affichageclanproperty("ALLSAVE", " ", true);
+ var urlwebapp = "https://script.google.com/macros/s/AKfycbxJmYTHBXM-_urMpk94iXv06jgCOjhGi7mljc39GYfhIZzq9Yo/exec?typeSelection=SEASONLIST";
+	$.getJSON(urlwebapp, function(data) {
+	seasondata = data; 
+	if (!db_data.getCollection("SEASONLIST")) {
+			var seasonColl = db_data.addCollection('SEASONLIST', { unique: ['season_id']});
+			var arrseasondata = Object.keys(seasondata).map(function(k) { return seasondata[k] });
+			seasonColl.insert(arrseasondata);
+			} else {
+			var seasonColl = db_data.getCollection('SEASONLIST');
+			};
+	loadLogSeason();
+	});
+
+	var urlwebapp = "https://script.google.com/macros/s/AKfycbxJmYTHBXM-_urMpk94iXv06jgCOjhGi7mljc39GYfhIZzq9Yo/exec?typeSelection=CLANLIST";
+	$.getJSON(urlwebapp, function(data) {
+	annuaireclan = data;  
+	if (!db_data.getCollection("CLANLIST")) {
+			var clanColl = db_data.addCollection('CLANLIST', { unique: ['id']});
+			var arrannuaireclan = Object.keys(annuaireclan).map(function(k) { return annuaireclan[k] });
+			clanColl.insert(arrannuaireclan);
+			} else {
+			var clanColl = db_data.getCollection('CLANLIST');
+			};
+	loadLogClan();
+	});
+
+	var urlwebapp = "https://script.google.com/macros/s/AKfycbxJmYTHBXM-_urMpk94iXv06jgCOjhGi7mljc39GYfhIZzq9Yo/exec?typeSelection=ALLSAVE";
+	$.getJSON(urlwebapp, function(data) {
+	listesaveresult = data; 
+	if (!db_data.getCollection("ALLSAVE")) {
+			var saveColl = db_data.addCollection('ALLSAVE', { unique: ['fichier']});
+			saveColl.insert(listesaveresult);
+			} else {
+			var saveColl = db_data.getCollection('ALLSAVE');
+			};
+	chargerlalistesave();
+	chargerlasave('extraction.json');
+	});	
+// affichageclanproperty("NAMELASTSAVE", " ", true);
+// affichageclanproperty("DATELASTSAVE", " ", true);
 
 $(document).ajaxError(function (event, xhr, settings) {
 	// if the HOST limit the cpu or error on page request
 	alert("my HOST refuse the REQUEST due to limit, reload plz (message from server =" + xhr.status + ")")
-	throw new Error(xhr.responseText)
+	//throw new Error(xhr.responseText)
 });
 
-$(document).ajaxSuccess(function (event, xhr, settings) {
+/* $(document).ajaxSuccess(function (event, xhr, settings) {
 	if (settings.data.includes("SEASONDATA")) {
 		seasondata = JSON.parse(xhr.responseText);
 		loadLogSeason();
@@ -201,7 +234,7 @@ $(document).ajaxSuccess(function (event, xhr, settings) {
 	if (settings.data.includes("BATTLETURNINFO")) {
 		listturnbattles = JSON.parse(xhr.responseText);;
 	}
-});
+}); */
 
 // when all AJAX are stopped or started.
 $(document).ajaxStop(function () {
@@ -325,56 +358,20 @@ $("#inputFullscreen").click(function () {
 });
 
 // button resync Clan
-$("#clanunknow").click(function () {
-	setTimeout(function () {
-		$('#preloadersync').show();
-		affichageclanproperty("REFRESHCLANONSAVE", JSON.stringify(listclanunknow), false);
-		affichageclanproperty("CLANLIST", " ", false);
-		$('#preloadersync').hide();
-		chargerlasave($("#choixSave").val());
-	}, 100);
+// $("#clanunknow").click(function () {
+	// setTimeout(function () {
+		// $('#preloadersync').show();
+		// affichageclanproperty("REFRESHCLANONSAVE", JSON.stringify(listclanunknow), false);
+		// affichageclanproperty("CLANLIST", " ", false);
+		// $('#preloadersync').hide();
+		// chargerlasave($("#choixSave").val());
+	// }, 100);
 
-});
+// });
 // button sync/ reload to reload last save, or build a new save.
 // the choice depend of timing (no build if last has less than 5 min or next automatic save scheduled in 5 min)
 $("#reactualisation").click(function () {
-	var datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);
-	var date_actuelle = new Date();
-	var datesave = new Date(datedernieresave * 1000);
-	var total_secondesreact = (date_actuelle - datesave) / 1000;
-	date_evenement.setHours(date_actuelle.getHours() + 1);
-	date_evenement.setMinutes(03);
-	var total_secondes = (date_evenement - date_actuelle) / 1000;
-	// no build, reload
-	if (total_secondesreact < 300 || total_secondes < 300) {
-		//	window.location.reload(false);
-		datedernieresave = affichageclanproperty("DATELASTSAVE", " ", true);
-		dernieresave = affichageclanproperty("NAMELASTSAVE", " ", true);
-	}
-	// build
-	else {
-		var resultatajax = "";
-		setTimeout(function () {
-			$('#preloadersync').show();
-
-			$.ajax({
-				type : 'POST',
-				url : 'tools/extracthour.php',
-				success : function (result) {
-					resultatajax = result;
-					$('#preloadersync').hide();
-					//window.location.reload(false);
-					datedernieresave = affichageclanproperty("DATELASTSAVE", " ", false);
-					dernieresave = affichageclanproperty("NAMELASTSAVE", " ", false);
-					$("#choixSave").val(dernieresave).change();
-				},
-				dataType : 'text',
-				async : false
-			});
-			return resultatajax;
-
-		}, 100);
-	};
+	$("#choixSave").val('extraction.json').change();
 });
 
 // clik on MAnager Filter button => new window to show
@@ -403,7 +400,6 @@ function chargerlasave(save) {
 	// when a new date is selected by user.
 	// until LOAD is not finished we show the preloader
 	setTimeout(function () {
-		preloader.show();
 
 		if (save == dernieresave) {
 			$('#ModeAffichage option[value="Batailles"]').removeAttr('disabled');
@@ -416,43 +412,87 @@ function chargerlasave(save) {
 			$('#ModeAffichage option[value="Batailles2"]').attr("disabled", "disabled");
 		}
 		if (save) {
-			listeclan = affichageclanproperty("LOADSAVE", save, false);
-			listeinfos = JSON.parse(listeclan);
+			if (!db_save.getCollection(save)) {
+						var urlwebapp = "https://script.google.com/macros/s/AKfycbxJmYTHBXM-_urMpk94iXv06jgCOjhGi7mljc39GYfhIZzq9Yo/exec?typeSelection=LOADSAVE&save="+ save;
+						$.getJSON(urlwebapp, function(data) { 
+						var listeinfosColl = db_save.addCollection(save);
+						listeinfosColl.insert(data);
+						listeinfos = listeinfosColl.chain( ).data()[0];
+						chargerlasave2(listeinfos);
+						}) 
+						}
+						else {
+						listeinfosColl = db_save.getCollection(save);
+						listeinfos = listeinfosColl.chain( ).data()[0];
+						chargerlasave2(listeinfos);
+						};
+			 }
+					console.log('fin de chargerlasave', new Date());
+		}, 100);
+	};
+function chargerlasave2(listeinfos) {		
 
-			if (listeinfos['season_id']) {
-				var lamapsave = 'tools/map/' + listeinfos['season_id'] + '.geojson';
-			} else {
-				var lamapsave = 'tools/map/europemap.geojson';
-			};
+
 			layers = map.getLayers().getArray();
 			vector = getLayerwarg(layers, "wargaming");
 			// optimization : reload geojson map only if change
 			if (chargedgeojson != listeinfos['season_id']) {
 				chargedgeojson = listeinfos['season_id'];
 				map.removeLayer(vector);
-				cartecomplete = new ol.layer.Image({
+				var masource = new ol.source.Vector({
+				format: new ol.format.GeoJSON()
+				});	
+
+			if (!db_map.getCollection(chargedgeojson)) {
+			var urlwebapp = "https://script.google.com/macros/s/AKfycbxJmYTHBXM-_urMpk94iXv06jgCOjhGi7mljc39GYfhIZzq9Yo/exec?typeSelection=MAP&seasonid=" + chargedgeojson;
+			$.getJSON(urlwebapp, function(data) { 
+			var listemapColl = db_map.addCollection(chargedgeojson);
+			listemapColl.insert(data);
+			var mamap = listemapColl.chain( ).data()[0];
+			datastring =  JSON.stringify(mamap);
+			var geojsonFormat = new ol.format.GeoJSON();
+			var features = geojsonFormat.readFeatures(datastring,
+			{featureProjection: 'EPSG:3857'});
+			masource.addFeatures(features);
+			chargerlasave3(masource);
+			}) 
+			}
+			else {
+			listemapColl = db_map.getCollection(chargedgeojson);
+			var mamap = listemapColl.chain( ).data()[0];
+			datastring =  JSON.stringify(mamap);
+			var geojsonFormat = new ol.format.GeoJSON();
+			var features = geojsonFormat.readFeatures(datastring,
+			{featureProjection: 'EPSG:3857'});
+			masource.addFeatures(features);
+			chargerlasave3(masource);
+			};
+
+				
+			} else {
+			    
+				vector = getLayerwarg(layers, "wargaming");
+				varlayersource = vector.getSource();
+				chargerlalog();
+				console.log('fin de  charger log sans changement de carte', new Date());
+				//Filterprovinceonmap();
+				console.log('debut de filteron province sans changement de carte', new Date());
+				var modAff = $('#ModeAffichage').val();
+				ModeAffichage(modAff);
+				console.log('fin de Mode affichage', new Date());
+				
+			};
+		};
+function chargerlasave3(masource) {
+				cartecomplete = new ol.layer.Vector({
 						idbase : "wargaming",
-						source : new ol.source.ImageVector({
-							source : new ol.source.Vector({
-								opacity : 0.2,
-								url : lamapsave,
-								format : new ol.format.GeoJSON()
-							}),
-							style : new ol.style.Style({
-								fill : new ol.style.Fill({
-									color : [255, 255, 255, 0.5],
-								}),
-								stroke : new ol.style.Stroke({
-									color : '#319FD3',
-									width : 1
-								})
-							})
-						})
+						source : masource
+						
 					});
 				map.addLayer(cartecomplete);
 				layers = map.getLayers().getArray();
 				vector = getLayerwarg(layers, "wargaming");
-				varlayersource = vector.getSource().getSource();
+				varlayersource = vector.getSource();
 
 				var listenerchangelayer = varlayersource.once('change', function (e) {
 						if (varlayersource.getState() === 'ready') {
@@ -472,21 +512,10 @@ function chargerlasave(save) {
 								alert(e.message);
 							}
 							map.getView().setCenter(center2Layers);
-							preloader.hide();
 						};
 					});
-			} else {
-				vector = getLayerwarg(layers, "wargaming");
-				varlayersource = vector.getSource().getSource();
-				chargerlalog();
-				Filterprovinceonmap();
-				var modAff = $('#ModeAffichage').val();
-				ModeAffichage(modAff);
-				preloader.hide();
-			};
-		}
-	}, 100);
-};
+			varlayersource.changed();
+}
 
 function ModeAffichage(mode) {
 	// this function analyse which display mode was choosen ,then
@@ -657,26 +686,15 @@ function ModeAffichage(mode) {
 function affichageclancolor() {
 	// DISPLAY mode CLAN : search color choosen by clan and put it on the map
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures()
 
-		var layer = new ol.layer.Image({
+		var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 1],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 
@@ -733,26 +751,15 @@ function affichageclancolor() {
 function affichageclanELO(ELO) {
 	// old method for display ELO... maybe can be rewrite by the new method Stat more simple and efficient...
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures()
 
-		var layer = new ol.layer.Image({
+		var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 1],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 
@@ -910,25 +917,14 @@ function affichageaccepts_join_requests() {
 	// DISPLAY clan recruit : green if accepted, black if not.
 	// get all province in a new layer, and delete old layer.
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures()
-		var layer = new ol.layer.Image({
+		var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 1],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 	// new layer to put text (clan name)
@@ -1017,25 +1013,14 @@ function affichagestat(mode) {
 	// DISPLAY stat, this is a generic method used to display all stat data on map.
 	// create a new layer for color and remove old one, create a layer for text
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures()
-		var layer = new ol.layer.Image({
+		var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 1],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 	var layer2 = new ol.layer.Vector({
@@ -1275,25 +1260,14 @@ function affichagelangagecolor() {
 	// layer 2 for the flag of the langage
 	// icone must have the same name as language and be a png.
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures()
-		var layer = new ol.layer.Image({
+		var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 1],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 	var layer2 = new ol.layer.Vector({
@@ -1389,7 +1363,7 @@ function affichagebatailles() {
 				return listeinfos.provinces[e].province_name == datarowprov
 			});
 		var datarowprovid = result3[0];
-		var listeprovinceatraiter = cartecomplete.getSource().getSource().getFeatures();
+		var listeprovinceatraiter = cartecomplete.getSource().getFeatures();
 		if (rows[row].cells[10].textContent > 0 || rows[row].cells[9].textContent > 0 || rows[row].cells[8].textContent > 0) {
 			var result3 = $.grep(listeprovinceatraiter, function (e) {
 					return e.getProperties().province_id == datarowprovid
@@ -1451,26 +1425,15 @@ function affichagefront() {
 	var vector = getLayerwarg(layers, "texte3");
 	map.removeLayer(vector);
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures()
 
-		var layer = new ol.layer.Image({
+		var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 0.5],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 
@@ -1567,25 +1530,14 @@ function affichageclanbattles() {
 	//           the color use intensity with the number of battles/ attacker / competitors
 	// layer 2 : counter of battle in text
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures();
-	var layer = new ol.layer.Image({
+	var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 1],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 	var layer2 = new ol.layer.Vector({
@@ -1606,7 +1558,7 @@ function affichageclanbattles() {
 				return listeinfos.provinces[e].province_name == datarowprov
 			});
 		var datarowprovid = result3[0];
-		var listeprovinceatraiter = cartecomplete.getSource().getSource().getFeatures();
+		var listeprovinceatraiter = cartecomplete.getSource().getFeatures();
 		var color1;
 		var color2 = new Array;
 		var nbtotal;
@@ -1748,26 +1700,15 @@ function affichageProvince() {
 	// same as affichageclancolor :
 	// layer is white with text = name province.
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures();
 	var styleText = new Array;
-	var layer = new ol.layer.Image({
+	var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 0],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 	var layer2 = new ol.layer.Vector({
@@ -1823,25 +1764,14 @@ function affichagehoraires() {
 	var vector = getLayerwarg(layers, "texte3");
 	map.removeLayer(vector);
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures()
-		var layer = new ol.layer.Image({
+		var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 0.5],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 	var stylecache = new Array;
@@ -1937,26 +1867,14 @@ function affichagerevenu() {
 	// same as affichageclancolor : layer use random color for each gradient of revenu
 	// another layer to display the revenu in text
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures();
-	var layer = new ol.layer.Image({
+	var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 0.5],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 	var layer2 = new ol.layer.Vector({
@@ -2032,25 +1950,14 @@ function affichagelevel() {
 	// same as affichageclancolor : layer use random color for each level of revenu
 	// another layer to display the level in text
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	map.removeLayer(vector);
 	var features = layerfeatures.getFeatures();
-	var layer = new ol.layer.Image({
+	var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : layerfeatures,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 0.5],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : layerfeatures
 		});
 	map.addLayer(layer);
 	var maxrevenu = 0;
@@ -2109,7 +2016,7 @@ function affichagelevel() {
 function afficherlesicones() {
 	// display the CLAN ICON
 	var vector = getLayerwarg(layers, "wargaming");
-	var varlayersource = vector.getSource().getSource();
+	var varlayersource = vector.getSource();
 	var layerfeatures = new ol.source.Vector();
 	layerfeatures.addFeatures(varlayersource.getFeatures());
 	var featuresas = layerfeatures.getFeatures()
@@ -2196,7 +2103,7 @@ function effacerbatailles() {
 	map.removeLayer(vector);
 };
 
-function affichageclanproperty(entree, clanid, async) {
+/* function affichageclanproperty(entree, clanid, async) {
 	// FUNCTION TO CALL ALL PHP METHOD NEEDED FOR THIS PAGE
 	var resultatajax = "";
 
@@ -2214,7 +2121,7 @@ function affichageclanproperty(entree, clanid, async) {
 		async : async
 	});
 	return resultatajax;
-};
+}; */
 
 function hexToRgb1(hex) {
 	// transform a Hex color format to Rgb Format
@@ -2365,7 +2272,10 @@ function getInfoBattle(idprov, provname) {
 	var contenuBattle;
 	$("html").addClass("wait");
 	setTimeout(function () {
-	affichageclanproperty("BATTLETURNINFO", idprov, false);
+	var urlwebapp = "https://script.google.com/macros/s/AKfycbxJmYTHBXM-_urMpk94iXv06jgCOjhGi7mljc39GYfhIZzq9Yo/exec?typeSelection=BATTLETURNINFO&provinceId=" + idprov;
+	$.getJSON(urlwebapp, function(data) {
+	listturnbattles = data; 
+	//affichageclanproperty("BATTLETURNINFO", idprov, false);
 	console.log(listturnbattles);
 	$('#InfoBattlesID').html('Battle on : ' + provname + '<input id="clikprovClan" onclick="clikprovClan(\''+idprov+'\')" type="button" data-toggle="tooltip" title="Return prov detail" value="' +idprov+ '" class="btn btn-primary">');
 	var turnnumber = Object.keys(listturnbattles).length;
@@ -2517,6 +2427,7 @@ function getInfoBattle(idprov, provname) {
 				$('#BattleInfo').modal('show');
 				$("html").removeClass("wait");
 			};
+			});
 					}, 100);
 	
 };
@@ -3089,9 +3000,9 @@ function loadLogSeason() {
 			var mapbuild;
 			if (seasondata[season].build != true) {
 				if (seasondata[season].status == 'ACTIVE') {
-					buildmap(seasondata[season].season_id);
+					mapbuild = 'Wait Building';
 				} else {
-					mapbuild = 'Not Build'
+					mapbuild = 'Not Ready'
 				}
 			} else {
 				mapbuild = 'Done'
@@ -3113,35 +3024,7 @@ function loadLogSeason() {
 	});
 }
 
-function buildmap(seasonid) {
-	// FIRST detect if a new season or event is open by WG, if so map has to be build, site waiting until finished.
-	// Server is limited to 30 sec script, so need to cut data and call MAPBUILD.PHP several times, as long as needed.
-	// (so after result, if map is not finished, the function is called again)
 
-	setTimeout(function () {
-		$('#building').show();
-		$.ajax({
-			type : 'POST',
-			url : 'tools/mapbuild.php',
-			data : {
-				typeselection : seasonid
-			},
-			success : function (result) {
-
-				// result = pourcentage avancement, mettre a jour progress bar
-				$("#loading-progress-bar").css("width", result + '%');
-				chargerlasave($("#choixSave").val());
-				map.render();
-				seasondata = JSON.parse(affichageclanproperty("SEASONDATA", " ", false));
-				loadLogSeason();
-			},
-			dataType : 'text',
-			async : true
-		});
-		$('#building').hide();
-	}, 100);
-
-}
 
 function showLogClan() {
 	// prepare the datatable CLAN
@@ -3326,7 +3209,7 @@ function chargerlalog() {
 	// load the table province
 	// when the function LOADSAVE is fired, this function was called to refresh data
 	var tabevent = [];
-	listclanunknow = [];
+	//listclanunknow = [];
 	$.each(listeinfos['provinces'], function (province) {
 		var nomclan;
 		var colorclan;
@@ -3371,7 +3254,7 @@ function chargerlalog() {
 				emblem = '';
 				langage = ' ';
 				clantoshow = 'Unknow';
-				listclanunknow.push(listeinfos['provinces'][province].owner_clan_id);
+				//listclanunknow.push(listeinfos['provinces'][province].owner_clan_id);
 			} else {
 				nomclan = listeinfos['provinces'][province].owner_clan_id;
 				color = 'white';
@@ -3437,7 +3320,7 @@ function chargerlalog() {
 	tableLog.draw();
 
 	// active or desactivate resync clan button
-	if (listclanunknow.length == 0) {
+/* 	if (listclanunknow.length == 0) {
 		$('#clanunknow').removeClass('btn btn-success');
 		$('#clanunknow').addClass('btn btn-default');
 		$('#clanunknow').attr('disabled', 'disabled');
@@ -3445,7 +3328,7 @@ function chargerlalog() {
 		$('#clanunknow').removeClass('btn btn-default');
 		$('#clanunknow').addClass('btn btn-success');
 		$('#clanunknow').removeAttr('disabled');
-	};
+	}; */
 };
 
 function chargerlaprov(prov) {
@@ -3474,20 +3357,9 @@ function Filterprovinceonmap() {
 	// usefull to redraw the map when filter change.
 	var vector = getLayerwarg(layers, "wargaming");
 	var carteincomplete = new ol.source.Vector();
-	var layer = new ol.layer.Image({
+	var layer = new ol.layer.Vector({
 			idbase : "wargaming",
-			source : new ol.source.ImageVector({
-				source : carteincomplete,
-				style : new ol.style.Style({
-					fill : new ol.style.Fill({
-						color : [255, 255, 255, 0.5],
-					}),
-					stroke : new ol.style.Stroke({
-						color : '#319FD3',
-						width : 1
-					})
-				})
-			})
+			source : carteincomplete
 		});
 
 	map.removeLayer(vector);
@@ -3507,7 +3379,7 @@ function Filterprovinceonmap() {
 		}
 	});
 	var i = 0;
-	var listeprovinceatraiter = cartecomplete.getSource().getSource().getFeatures();
+	var listeprovinceatraiter = cartecomplete.getSource().getFeatures();
 	$.each(listeprovinceatraiter, function (index, feature) {
 		var result3 = $.grep(filteredprov, function (e) {
 				return e == feature.getProperties().province_id
