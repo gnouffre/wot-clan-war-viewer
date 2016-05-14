@@ -242,7 +242,7 @@ $(document).ajaxStop(function () {
 	// season and clan are loaded at start only, province is loaded when a save is loaded only.
 	// really poor code , maybe better to do
 	// due to ajax async, i can try to put lastsave while select save was empty, so the select is void on first load of page
-	$('#preloaderPage').hide();
+	//$('#preloaderPage').hide();
 });
 
 /* $(document).ajaxStart(function () {
@@ -521,7 +521,7 @@ function ModeAffichage(mode) {
 	// this function analyse which display mode was choosen ,then
 	// call the function needed.
 	setTimeout(function () {
-		preloader.show();
+		//preloader.show();
 		switch (mode) {
 		case 'Clan':
 			effacericone();
@@ -678,7 +678,7 @@ function ModeAffichage(mode) {
 		default:
 			break;
 		};
-		preloader.hide();
+		//preloader.hide();
 	}, 100);
 
 };
