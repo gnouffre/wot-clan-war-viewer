@@ -226,7 +226,7 @@ var dernieresave = 'extraction.json';
 				vector = getLayerwarg(layers, "wargaming");
 				varlayersource = vector.getSource();
 				ModeAffichage("Clan");
-				
+				chargerlalog();
 			}) 
 		}) 
 // affichageclanproperty("NAMELASTSAVE", " ", true);
