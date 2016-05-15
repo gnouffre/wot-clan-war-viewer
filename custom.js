@@ -225,29 +225,8 @@ var dernieresave = 'extraction.json';
 				layers = map.getLayers().getArray();
 				vector = getLayerwarg(layers, "wargaming");
 				varlayersource = vector.getSource();
-
-				var listenerchangelayer = varlayersource.once('change', function (e) {
-						if (varlayersource.getState() === 'ready') {
-							// carte chargée
-							map.unByKey(listenerchangelayer);
-							chargerlalog();
-							Filterprovinceonmap();
-							var modAff = $('#ModeAffichage').val();
-							ModeAffichage(modAff);
-
-							try {
-								vector2 = getLayerwarg(layers, "TileWMS");
-								extentWARN = varlayersource.getExtent();
-								center2Layers = ol.extent.getCenter(extentWARN);
-								//alert(center2Layers);
-							} catch (e) {
-								alert(e.message);
-							}
-							map.getView().setCenter(center2Layers);
-						};
-					});
-					
-			varlayersource.changed();
+				ModeAffichage("Clan");
+				
 			}) 
 		}) 
 // affichageclanproperty("NAMELASTSAVE", " ", true);
@@ -550,7 +529,27 @@ function chargerlasave3(masource) {
 				layers = map.getLayers().getArray();
 				vector = getLayerwarg(layers, "wargaming");
 				varlayersource = vector.getSource();
+				var listenerchangelayer = varlayersource.once('change', function (e) {
+						if (varlayersource.getState() === 'ready') {
+							// carte chargée
+							map.unByKey(listenerchangelayer);
+							chargerlalog();
+							Filterprovinceonmap();
+							var modAff = $('#ModeAffichage').val();
+							ModeAffichage(modAff);
 
+							try {
+								vector2 = getLayerwarg(layers, "TileWMS");
+								extentWARN = varlayersource.getExtent();
+								center2Layers = ol.extent.getCenter(extentWARN);
+								//alert(center2Layers);
+							} catch (e) {
+								alert(e.message);
+							}
+							map.getView().setCenter(center2Layers);
+						};
+					});
+					
 
 			varlayersource.changed();
 }
